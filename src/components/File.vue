@@ -6,6 +6,7 @@ import type {UploadCustomRequestOptions} from 'naive-ui'
 import type {FileInfo} from "naive-ui/es/upload/src/interface";
 import {useRandomName} from "@/use/RandomName";
 import axios from "axios";
+import {useUploader} from "@/use/Uploader";
 
 interface Field {
     options: {
@@ -64,38 +65,23 @@ const customRequest = async ({file}: UploadCustomRequestOptions) => {
 
     const {data: obsConfig} = await axios.get(provides.obs_config_url, {params: {disk, filename}})
 
+    let upload;
     switch (disk) {
         case 'oss':
-            viaOss(file, filename, percentage, obsConfig)
+            upload = useUploader.oss(file.file, filename, percentage, obsConfig)
             break
         case 'qiniu':
-            viaQiniu(file, filename, percentage, obsConfig)
+            upload = useUploader.qiniu(file.file, filename, percentage, obsConfig)
             break
         case 'cos':
         case 'cosv5':
-            viaCos(file, filename, percentage, obsConfig)
+            upload = useUploader.cos(file.file, filename, percentage, obsConfig)
             break
         default:
-            viaLocal(file, filename, percentage, obsConfig)
+            upload = useUploader.local(file.file, filename, percentage, obsConfig)
     }
-}
 
-function viaOss(file: FileInfo, filename: string, percentage: Ref, oss: any) {
-    const fd = new FormData()
-    fd.append('name', file.name)
-    fd.append('key', filename)
-    fd.append('policy', oss.policy)
-    fd.append('OSSAccessKeyId', oss.accessid)
-    fd.append('success_action_status', '200')
-    fd.append('callback', '')
-    fd.append('signature', oss.signature)
-    fd.append('file', file.file!, file.name)
-
-    axios.post(oss.host, fd, {
-        onUploadProgress: progressEvent => {
-            percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-        }
-    }).then(res => {
+    upload.then(() => {
         file.status = 'finished'
         if (provides.multiple) {
             value.value.push(filename)
@@ -103,130 +89,13 @@ function viaOss(file: FileInfo, filename: string, percentage: Ref, oss: any) {
             value.value = [filename]
         }
 
-        axios.post(provides.uploaded_url, {
-            files: filename,
-            disk: provides.disk,
-        })
+        useUploader.uploaded(provides.uploaded_url, filename, disk)
 
         notification.success({
             content: `${file.name}`,
             meta: '上传成功'
         })
-    }).catch(e => {
-        console.log(e)
-        file.status = 'error'
-        notification.error({
-            content: e.message,
-            meta: '上传失败'
-        })
-    })
-}
-
-function viaQiniu(file: FileInfo, filename: string, percentage: Ref, qiniu: any) {
-    const fd = new FormData()
-    fd.append('token', qiniu.token)
-    fd.append('key', filename)
-    fd.append('file', file.file!, file.name)
-
-    axios.post(qiniu.host, fd, {
-        onUploadProgress: progressEvent => {
-            percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-        }
-    }).then(res => {
-        file.status = 'finished'
-        if (provides.multiple) {
-            value.value.push(filename)
-        } else {
-            value.value = [filename]
-        }
-
-        axios.post(provides.uploaded_url, {
-            files: filename,
-            disk: provides.disk,
-        })
-
-        notification.success({
-            content: `${file.name}`,
-            meta: '上传成功'
-        })
-    }).catch(e => {
-        console.log(e)
-        file.status = 'error'
-        notification.error({
-            content: e.message,
-            meta: '上传失败'
-        })
-    })
-}
-
-function viaCos(file: FileInfo, filename: string, percentage: Ref, cos: any) {
-    const fd = new FormData()
-    fd.append('file', file.file!, file.name)
-
-
-    axios.put(cos.host, fd, {
-        headers: {
-            'Authorization': cos.auth.Credentials.Token
-        },
-        onUploadProgress: progressEvent => {
-            percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-        }
-    }).then(res => {
-        file.status = 'finished'
-
-        if (provides.multiple) {
-            value.value.push(filename)
-        } else {
-            value.value = [filename]
-        }
-
-        axios.post(provides.uploaded_url, {
-            files: filename,
-            disk: provides.disk,
-        })
-
-        notification.success({
-            content: `${file.name}`,
-            meta: '上传成功'
-        })
-    }).catch(e => {
-        console.log(e)
-        file.status = 'error'
-        notification.error({
-            content: e.message,
-            meta: '上传失败'
-        })
-    })
-}
-
-function viaLocal(file: FileInfo, filename: string, percentage: Ref, local: any) {
-    const fd = new FormData()
-    fd.append('key', filename)
-    fd.append('file', file.file!, file.name)
-
-
-    axios.post(local.host, fd, {
-        onUploadProgress: progressEvent => {
-            percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-        }
-    }).then(res => {
-        file.status = 'finished'
-        if (provides.multiple) {
-            value.value.push(filename)
-        } else {
-            value.value = [filename]
-        }
-
-        axios.post(provides.uploaded_url, {
-            files: filename,
-            disk: provides.disk,
-        })
-
-        notification.success({
-            content: `${file.name}`,
-            meta: '上传成功'
-        })
-    }).catch(e => {
+    }).catch((e: any) => {
         console.log(e)
         file.status = 'error'
         notification.error({

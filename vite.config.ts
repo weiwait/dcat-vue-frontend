@@ -14,5 +14,13 @@ export default defineConfig({
     }
   },
   build: {
+    minify: false,
+    outDir: '/Volumes/projects/PhpstormProjects/dcat-admin-extension/public/vendor/dcat-admin-extensions/weiwait/dcat-vue',
+    rollupOptions: {
+      output: {
+        assetFileNames: 'css/index.css',
+        entryFileNames: 'js/index.js'
+      }
+    }
   }
 })
