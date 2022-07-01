@@ -4,18 +4,24 @@ export class useCropper {
     private cropper: Cropper|null = null;
     private done: Function;
     private src: string;
-    constructor(img: HTMLImageElement, src: string, done: Function) {
+    private opened: string | File;
+    private index: number | null;
+
+    constructor(img: HTMLImageElement, src: string, done: Function, opened: string | File, index: number | null = null) {
         this.done = done
         this.src = src
+        this.opened = opened
+        this.index = index
 
         new Promise<void>((resolve, reject) => {
             img.onload = () => resolve()
             img.onerror = () => reject()
 
-            img.style.visibility = 'hidden'
             img.src = src
         }).then(() => {
-            this.cropper = new Cropper(img)
+            this.cropper = new Cropper(img, {
+                checkCrossOrigin: false
+            })
         })
     }
 
@@ -46,6 +52,14 @@ export class useCropper {
     }
     
     original() {
-        
+        if (this.opened instanceof File) {
+            return this.done(this.opened)
+        }
+
+        this.done(false)
+    }
+
+    delete(handler: Function) {
+        handler(this.index)
     }
 }

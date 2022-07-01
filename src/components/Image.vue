@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, inject, watch} from "vue";
+import {ref, inject, nextTick} from "vue";
 import {
     NUpload,
     NUploadDragger,
@@ -69,15 +69,13 @@ const notification = useNotification()
 
 
 const showModal = ref(false)
-const modalShowed = ref<Function>(() => {throw Error('未定义的回调')})
 const croppingImg = ref<HTMLImageElement | null>(null)
-watch(croppingImg, n => {
-    null !== n && modalShowed.value()
-})
+
 function showCropper() {
-    return new Promise<void>(resolve => {
-        modalShowed.value = resolve
+    return new Promise<void>(async (resolve) => {
         showModal.value = true
+        await nextTick()
+        resolve()
     })
 }
 
@@ -87,19 +85,20 @@ function closeCropper() {
 
 
 const cropper = ref<useCropper | null>(null)
+
 function beginCropper(file: File | null) {
     return new Promise<File>(done => {
-        new Promise<string>(resolve => {
+        new Promise<{src: string, file: File}>(resolve => {
             const reader = new FileReader()
 
             reader.onload = ev => {
-                resolve(String(ev.target?.result))
+                resolve({src: String(ev.target?.result), file: file!})
             }
 
             reader.readAsDataURL(file!)
-        }).then((image: string) => {
+        }).then(({src, file}) => {
             showCropper().then(() => {
-                cropper.value = new useCropper(croppingImg.value!, image, done)
+                cropper.value = new useCropper(croppingImg.value!, src, done, file)
             })
         })
     })
@@ -157,37 +156,42 @@ async function upload(file: File | Blob, filename: string, current: number) {
         })
 
         notification.success({
-            content: `${filename}`,
-            meta: '上传成功'
+            content: `文件 ${filename}`,
+            title: '上传成功',
+            duration: 10000,
         })
     }).catch((e: any) => {
         console.log(e)
         notification.error({
             content: e.message,
-            meta: '上传失败'
+            meta: '上传失败',
+            duration: 10000,
         })
     })
-}
-
-function clearFile(index: number) {
-    value.value.splice(index, 1)
 }
 
 function editing(index: number) {
-    console.log(previews, index)
-
-    new Promise<Blob>(done => {
+    new Promise(done => {
         showCropper().then(() => {
-            cropper.value = new useCropper(croppingImg.value!, previews.value[index], done)
+            cropper.value = new useCropper(croppingImg.value!, previews.value[index], done, 'edit', index)
         })
     }).then(blob => {
-        previews.value[index] = URL.createObjectURL(blob)
+        if ((blob instanceof Blob) || (blob instanceof File)) {
+            previews.value[index] = URL.createObjectURL(blob)
+
+            const filename = provides.dir + '/' + useRandomName(value.value[index], 'png')
+            upload(blob, filename, index)
+        }
 
         closeCropper()
-
-        const filename = provides.dir + '/' + useRandomName(value.value[index], 'png')
-        upload(blob, filename, index)
     })
+}
+
+function deleteHandler(index: number) {
+    value.value.splice(index, 1)
+    previews.value.splice(index, 1)
+
+    closeCropper()
 }
 
 </script>
@@ -222,7 +226,7 @@ function editing(index: number) {
                     <n-button @click="cropper.targetLeft()" type="warning">️←</n-button>
                     <n-button @click="cropper.targetRight()" type="warning">️→</n-button>
                     <n-button @click="cropper.reset()" type="warning">重置</n-button>
-                    <n-button @click="cropper.crop()" type="warning">删除</n-button>
+                    <n-button @click="cropper.delete(deleteHandler)" type="warning">删除</n-button>
                     <n-button @click="cropper.crop()" type="warning">更换</n-button>
                 </n-button-group>
                 <n-button-group size="small">
@@ -285,8 +289,7 @@ function editing(index: number) {
         img {
             max-width: 100%;
             display: block;
-            object-fit: contain;
-
+            visibility: hidden;
         }
     }
 
