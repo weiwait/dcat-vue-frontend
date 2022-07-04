@@ -27,7 +27,7 @@ export class useCropper {
 
     crop() {
         this.cropper!.getCroppedCanvas().toBlob(blob => {
-            this.done(blob)
+            this.done({blob, index: this.index})
         })
     }
 

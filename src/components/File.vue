@@ -113,7 +113,7 @@ function clearFile(index: number) {
 
 <template>
     <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
-        <n-upload-dragger>
+        <n-upload-dragger class="custom-upload-dragger">
             <div style="margin-bottom: 12px">
                 <n-progress type="circle" :percentage="percentage"/>
             </div>
@@ -134,5 +134,9 @@ function clearFile(index: number) {
 <style scoped lang="scss">
 .file-list-wrap {
     margin-top: 2px!important;
+}
+
+.custom-upload-dragger {
+    max-width: 400px;
 }
 </style>

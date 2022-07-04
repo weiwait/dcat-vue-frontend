@@ -17,7 +17,8 @@ export const useUploader = <any>{
         return axios.post(config.host, fd, {
             onUploadProgress: progressEvent => {
                 percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-            }
+            },
+            timeout: 0,
         })
     },
     qiniu(file: File | Blob, filename: string, percentage: Ref, config: any) {
@@ -29,7 +30,8 @@ export const useUploader = <any>{
         return axios.post(config.host, fd, {
             onUploadProgress: progressEvent => {
                 percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-            }
+            },
+            timeout: 0,
         })
     },
     cos(file: File | Blob, filename: string, percentage: Ref, config: any) {
@@ -41,7 +43,8 @@ export const useUploader = <any>{
         return axios.post(config.host, fd, {
             onUploadProgress: progressEvent => {
                 percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-            }
+            },
+            timeout: 0,
         })
     },
     local(file: File | Blob, filename: string, percentage: Ref, config: any) {
@@ -53,7 +56,8 @@ export const useUploader = <any>{
         return axios.post(config.host, fd, {
             onUploadProgress: progressEvent => {
                 percentage.value = ~~(progressEvent.loaded / progressEvent.total * 100)
-            }
+            },
+            timeout: 0,
         })
     },
     uploaded(url: string, filename: string, disk: string) {
