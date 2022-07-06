@@ -45,6 +45,7 @@ interface Field {
     dir: string,
     multiple: boolean,
     value: Array<string>
+    attributes: any
 }
 
 const provides = inject<Field>('provides')!
@@ -52,7 +53,6 @@ const type = provides.options.quality ? 'jpg' : 'png'
 
 const value = ref(provides.value || [])
 const column = ref(provides.column)
-const disabled = ref(provides.disabled ?? []);
 
 const percentage = ref(0)
 
@@ -171,14 +171,13 @@ async function upload(file: File | Blob, filename: string, current: number) {
         notification.success({
             content: `文件 ${filename}`,
             title: '上传成功',
-            duration: 10000,
+            duration: 8000,
         })
     }).catch((e: any) => {
         console.log(e)
         notification.error({
             content: e.message,
-            meta: '上传失败',
-            duration: 10000,
+            duration: 8000,
         })
     })
 }
@@ -200,8 +199,8 @@ function editing(index: number) {
 
 function remove() {
     if (null !== currentIndex.value) {
-        value.value.splice(currentIndex.value, 1)
-        previews.value.splice(currentIndex.value, 1)
+        value.value.splice(currentIndex.value!, 1)
+        previews.value.splice(currentIndex.value!, 1)
     }
 
     closeCropper()
@@ -216,6 +215,7 @@ function replace() {
 }
 
 const dragging = ref<number>()
+
 function dragoverHandler(index: number) {
     let current = previews.value.splice(dragging.value!, 1)
     previews.value.splice(index, 0, ...current)
@@ -247,6 +247,9 @@ function dragoverHandler(index: number) {
             </n-upload-dragger>
         </n-upload>
     </n-space>
+
+    <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
+           :name="`${column}_is_required`" style="display: none;">
 
     <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="column + '[]'" :value="item">
     <input v-else v-for="item of value" type="hidden" :name="column" :value="item">

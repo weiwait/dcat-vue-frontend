@@ -34,7 +34,8 @@ interface Field {
     obs_config_url: string,
     dir: string,
     multiple: boolean,
-    value: Array<string>
+    value: Array<string>,
+    attributes: any,
 }
 
 const provides = inject<Field>('provides')!
@@ -122,6 +123,9 @@ function clearFile(index: number) {
             </n-text>
         </n-upload-dragger>
     </n-upload>
+
+    <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
+           :name="`${column}_is_required`" style="display: none;">
 
     <n-space class="file-list-wrap" v-for="(item, index) of value">
         <n-tag :closable="true" type="success" @close="clearFile(index)">{{ item }}</n-tag>
