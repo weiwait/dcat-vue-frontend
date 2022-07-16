@@ -26,6 +26,7 @@
 import {defineProps, nextTick, ref, onMounted} from "vue";
 import Cropper from "cropperjs";
 import {NModal, NSpace, NButtonGroup, NButton} from 'naive-ui'
+import 'cropperjs/src/index.scss'
 
 const props = defineProps<{ src: string, resolveCropped: Function, replace: Function, remove: Function, options: any }>()
 const show = ref(false)
@@ -36,7 +37,6 @@ let cropper: Cropper
 onMounted(async () => {
     img.src = props.src
     img.crossOrigin = 'anonymous'
-    img.style.visibility = 'hidden'
     img.style.maxWidth = '100%'
 
     show.value = true
@@ -106,7 +106,6 @@ function reset() {
         img {
             max-width: 100%;
             display: block;
-            visibility: hidden;
         }
     }
 

@@ -21,7 +21,7 @@ interface Field {
         accept: {
             mimeTypes: string,
         },
-        previews: [],
+        preview: [],
         quality: number,
     },
     column: string,
@@ -56,7 +56,7 @@ const column = ref(provides.column)
 
 const percentage = ref(0)
 
-const previews = ref<Array<string>>(provides.options.previews ?? [])
+const previews = ref<Array<string>>(provides.options.preview ?? [])
 const currentIndex = ref<number | null>(null)
 const currentSrc = ref<string>('')
 
@@ -296,32 +296,6 @@ function dragoverHandler(index: number) {
     .btn-plus {
         font-size: 88px;
         color: #b0b0b0;
-    }
-}
-
-.modal-container {
-    display: flex;
-    flex-direction: column;
-
-    .cropper-container {
-        width: 480px;
-        height: 270px;
-
-        img {
-            max-width: 100%;
-            display: block;
-            visibility: hidden;
-        }
-    }
-
-    .cropper-controls {
-        height: 50px;
-        display: flex;
-        align-items: center;
-
-        .controls-first {
-            margin-left: 12px;
-        }
     }
 }
 </style>
