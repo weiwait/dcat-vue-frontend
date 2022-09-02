@@ -25,6 +25,7 @@ interface Field {
         quality: number,
     },
     column: string,
+    name: string,
     checked: Array<string | number>,
     disabled: Array<string | number>,
     watch: Array<any>,
@@ -52,7 +53,7 @@ const provides = inject<Field>('provides')!
 const type = provides.options.quality ? 'jpg' : 'png'
 
 const value = ref(provides.value || [])
-const column = ref(provides.column)
+const name = ref(provides.name)
 
 const percentage = ref(0)
 
@@ -168,6 +169,7 @@ async function upload(file: File | Blob, filename: string, current: number) {
             previews.value[current] = res.data
         })
 
+        // @ts-ignore
         notification.success({
             content: `文件 ${filename}`,
             title: '上传成功',
@@ -175,6 +177,7 @@ async function upload(file: File | Blob, filename: string, current: number) {
         })
     }).catch((e: any) => {
         console.log(e)
+        // @ts-ignore
         notification.error({
             content: e.message,
             duration: 8000,
@@ -209,6 +212,7 @@ function remove() {
 const uploader = ref()
 
 function replace() {
+    // @ts-ignore
     uploader.value._.vnode.el.click()
 
     closeCropper(false)
@@ -249,10 +253,10 @@ function dragoverHandler(index: number) {
     </n-space>
 
     <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
-           :name="`${column}_is_required`" style="display: none;">
+           :name="`${name}_is_required`" style="display: none;">
 
-    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="column + '[]'" :value="item">
-    <input v-else v-for="item of value" type="hidden" :name="column" :value="item">
+    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
+    <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
 
     <cropper v-if="showCropper" :src="currentSrc" :resolve-cropped="resolveCropped" :replace="replace" :remove="remove"
              :options="provides.options"></cropper>

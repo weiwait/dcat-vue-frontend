@@ -15,6 +15,7 @@ import {Add} from '@vicons/ionicons5'
 interface Field {
     options: Array<string>,
     column: string,
+    name: string,
     checked: Array<string | number>,
     disabled: Array<string | number>,
     watch: Array<any>,
@@ -41,7 +42,7 @@ interface Field {
 
 const provides = inject<Field>('provides')!
 
-const column = ref(provides.column)
+const name = ref(provides.name)
 
 const tags = ref(provides.value || [])
 const customInput = ref('')
@@ -98,9 +99,9 @@ const options = computed(() => {
     </n-dynamic-tags>
 
     <input v-if="provides.attributes.required" type="text" :required="!tags.length" :disabled="!!tags.length"
-           :name="`${column}_is_required`" style="display: none;">
+           :name="`${name}_is_required`" style="display: none;">
 
-    <input v-for="tag in tags" type="hidden" :name="column + '[]'" :value="tag">
+    <input v-for="tag in tags" type="hidden" :name="name + '[]'" :value="tag">
 </template>
 
 <style scoped lang="scss">

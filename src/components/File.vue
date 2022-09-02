@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {ref, inject} from "vue";
-import type {Ref} from "vue";
-import {NUpload, NUploadDragger, NText, NSpace, NProgress, NTag, useNotification} from "naive-ui";
+import {NUpload, NUploadDragger, NText, NSpace, NProgress, NTag, NGrid, NGridItem, useNotification} from "naive-ui";
 import type {UploadCustomRequestOptions} from 'naive-ui'
-import type {FileInfo} from "naive-ui/es/upload/src/interface";
 import {useRandomName} from "@/use/RandomName";
 import axios from "axios";
 import {useUploader} from "@/use/Uploader";
@@ -15,6 +13,7 @@ interface Field {
         }
     },
     column: string,
+    name: string,
     checked: Array<string | number>,
     disabled: Array<string | number>,
     watch: Array<any>,
@@ -41,16 +40,8 @@ interface Field {
 const provides = inject<Field>('provides')!
 
 const value = ref(provides.value || [])
-const column = ref(provides.column)
+const name = ref(provides.name)
 const disabled = ref(provides.disabled ?? []);
-
-function change(e: any) {
-    document.dispatchEvent(new CustomEvent(`${column.value}:change`, {
-        detail: {
-            value: [...value.value]
-        }
-    }))
-}
 
 const percentage = ref(0)
 const notification = useNotification()
@@ -113,34 +104,34 @@ function clearFile(index: number) {
 </script>
 
 <template>
-    <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
-        <n-upload-dragger class="custom-upload-dragger">
-            <div style="margin-bottom: 12px">
-                <n-progress type="circle" :percentage="percentage"/>
-            </div>
-            <n-text style="font-size: 16px">
-                点击或者拖动文件到该区域来上传
-            </n-text>
-        </n-upload-dragger>
-    </n-upload>
+    <n-grid :cols="2">
+        <n-grid-item>
+            <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
+                <n-upload-dragger>
+                    <div style="margin-bottom: 12px">
+                        <n-progress type="circle" :percentage="percentage"/>
+                    </div>
+                    <n-text style="font-size: 16px">
+                        点击或者拖动文件到该区域来上传
+                    </n-text>
+                </n-upload-dragger>
+            </n-upload>
+        </n-grid-item>
+    </n-grid>
 
     <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
-           :name="`${column}_is_required`" style="display: none;">
+           :name="`${name}_is_required`" style="display: none;">
 
     <n-space class="file-list-wrap" v-for="(item, index) of value">
         <n-tag :closable="true" type="success" @close="clearFile(index)">{{ item }}</n-tag>
     </n-space>
 
-    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="column + '[]'" :value="item">
-    <input v-else v-for="item of value" type="hidden" :name="column" :value="item">
+    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
+    <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
 </template>
 
 <style scoped lang="scss">
 .file-list-wrap {
     margin-top: 2px!important;
-}
-
-.custom-upload-dragger {
-    max-width: 400px;
 }
 </style>
