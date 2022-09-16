@@ -257,6 +257,7 @@ function dragoverHandler(index: number) {
 
     <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
     <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
+    <input v-if="!value.length" type="hidden" :name="name" :value="''">
 
     <cropper v-if="showCropper" :src="currentSrc" :resolve-cropped="resolveCropped" :replace="replace" :remove="remove"
              :options="provides.options"></cropper>

@@ -83,6 +83,7 @@ const customRequest = async ({file}: UploadCustomRequestOptions) => {
 
         useUploader.uploaded(provides.uploaded_url, filename, disk)
 
+        // @ts-ignore
         notification.success({
             content: `${file.name}`,
             meta: '上传成功'
@@ -90,6 +91,7 @@ const customRequest = async ({file}: UploadCustomRequestOptions) => {
     }).catch((e: any) => {
         console.log(e)
         file.status = 'error'
+        // @ts-ignore
         notification.error({
             content: e.message,
             meta: '上传失败'
@@ -128,6 +130,7 @@ function clearFile(index: number) {
 
     <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
     <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
+    <input v-if="!value.length" type="hidden" :name="name" :value="''">
 </template>
 
 <style scoped lang="scss">
