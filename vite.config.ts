@@ -14,7 +14,7 @@ export default defineConfig({
     }
   },
   build: {
-    minify: true,
+    minify: false,
     outDir: '/Volumes/projects/PhpstormProjects/dcat-admin-extension/public/vendor/dcat-admin-extensions/weiwait/dcat-vue',
     rollupOptions: {
       output: {

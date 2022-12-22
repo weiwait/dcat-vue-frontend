@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, inject, unref} from "vue";
+import {ref, inject, unref, onMounted} from "vue";
 import {NDynamicInput, NInput} from "naive-ui";
 import type {BaseField} from "@/component";
 import {useNum2el} from "@/use/Utils";
@@ -19,7 +19,7 @@ const provides = inject<Field>('provides')!
 const value = ref(provides.value)
 const name = ref(provides.name)
 
-function onUpdate(uv: any) {
+function reBuildIndex(uv: any) {
     value.value = uv.map((item: any, i: number) => {
         let key = ''
 
@@ -32,6 +32,14 @@ function onUpdate(uv: any) {
         return {"key": key, "value": unref(item)?.value}
     })
 }
+
+function onUpdate(uv: any) {
+    reBuildIndex(uv)
+}
+
+onMounted(() => {
+    reBuildIndex(value.value)
+})
 
 </script>
 

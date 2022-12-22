@@ -8,7 +8,10 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^35.2.0",
+    "@ckeditor/ckeditor5-vue": "^4.0.1",
     "@tinymce/tinymce-vue": "^4.0.7",
+    "@types/ckeditor__ckeditor5-core": "^33.0.3",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
     "cropperjs": "^1.5.12",
@@ -16,6 +19,7 @@
     "mitt": "^3.0.0",
     "pinia": "^2.0.13",
     "sass": "^1.52.1",
+    "tinymce": "^6.2.0",
     "ts-md5": "^1.2.11",
     "vue": "^3.2.33"
   },
