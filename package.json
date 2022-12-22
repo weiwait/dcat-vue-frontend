@@ -8,30 +8,30 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^35.2.0",
+    "@ckeditor/ckeditor5-build-classic": "^35.4.0",
     "@ckeditor/ckeditor5-vue": "^4.0.1",
     "@tinymce/tinymce-vue": "^4.0.7",
     "@types/ckeditor__ckeditor5-core": "^33.0.3",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
-    "cropperjs": "^1.5.12",
+    "cropperjs": "^1.5.13",
     "md5": "^2.3.0",
     "mitt": "^3.0.0",
-    "pinia": "^2.0.13",
-    "sass": "^1.52.1",
-    "tinymce": "^6.2.0",
-    "ts-md5": "^1.2.11",
-    "vue": "^3.2.33"
+    "pinia": "^2.0.28",
+    "sass": "^1.57.1",
+    "tinymce": "^6.3.1",
+    "ts-md5": "^1.3.1",
+    "vue": "^3.2.45"
   },
   "devDependencies": {
-    "@types/ali-oss": "^6.16.3",
-    "@types/node": "^16.11.27",
+    "@types/ali-oss": "^6.16.7",
+    "@types/node": "^16.18.10",
     "@vicons/ionicons5": "^0.12.0",
-    "@vitejs/plugin-vue": "^2.3.1",
+    "@vitejs/plugin-vue": "^2.3.4",
     "@vue/tsconfig": "^0.1.3",
-    "naive-ui": "^2.28.2",
+    "naive-ui": "^2.34.2",
     "typescript": "~4.6.3",
-    "vite": "^2.9.5",
+    "vite": "^2.9.15",
     "vue-tsc": "^0.34.7"
   }
 }
