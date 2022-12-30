@@ -5,6 +5,7 @@ import Tag from './components/Tag.vue'
 import DateRange from './components/DateRange.vue'
 import List from './components/List.vue'
 import KeyValue from './components/KeyValue.vue'
+import DistPicker from './components/DistPicker.vue'
 import type {App} from "vue";
 
 
@@ -16,6 +17,7 @@ export default function registerFields(app: App) {
         .component('DateRange', DateRange)
         .component('List', List)
         .component('KeyValue', KeyValue)
+        .component('DistPicker', DistPicker)
 
     return app
 }

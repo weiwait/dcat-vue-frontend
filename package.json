@@ -2,8 +2,8 @@
   "name": "dcat-cropper",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "dev": "vite build --mode development",
+    "build": "vue-tsc --noEmit & vite build",
     "preview": "vite preview --port 5050",
     "typecheck": "vue-tsc --noEmit"
   },
