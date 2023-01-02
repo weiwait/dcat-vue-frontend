@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, inject, onUnmounted} from "vue";
+import {ref, inject, onUnmounted, onMounted} from "vue";
 import {NSelect} from "naive-ui";
 import type {BaseField} from "@/component";
 import {useFormStore} from "@/use/FormStore";
@@ -30,6 +30,11 @@ onUnmounted(() => {
     useFormStore().cleanupWatch(provides.optionsFromKeyValueField)
 })
 
+const placement = ref<string|Element>('body')
+
+onMounted(() => {
+    placement.value = document.getElementById(provides.mountId).closest('.layui-layer.layui-layer-page') || 'body'
+})
 </script>
 
 <template>
@@ -39,6 +44,7 @@ onUnmounted(() => {
         clearable
         :placeholder="provides.placeholder"
         :options="options"
+        :to="placement"
     />
 
     <input v-if="provides.attributes.required" type="text" :required="![null, undefined].includes(typeof value)" :disabled="!![null, undefined].includes(typeof value)"

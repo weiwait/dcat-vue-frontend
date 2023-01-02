@@ -23,4 +23,5 @@ export type BaseField = {
     obs_config_url: string,
     dir: string,
     multiple: boolean,
+    mountId: string,
 }
