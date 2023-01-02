@@ -1,3 +1,6 @@
+import {createPinia} from "pinia";
+import type {Pinia} from "pinia"
+
 export const useNum2el = (num: number) => {
     let front = ''
 
@@ -37,5 +40,19 @@ export class Debounce {
         }
 
         return Debounce.instance
+    }
+}
+
+export class SinglePinia {
+    private static instance: SinglePinia
+    private static pinia: Pinia
+
+    static getPinia() {
+        if (!SinglePinia.instance) {
+            SinglePinia.instance = new SinglePinia()
+            SinglePinia.pinia = createPinia()
+        }
+
+        return SinglePinia.pinia
     }
 }

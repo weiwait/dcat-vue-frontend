@@ -23,7 +23,6 @@ const value = ref<[number, number]>(provides.value)
 const start = computed(() => value.value ? new Date(value.value[0]).toLocaleDateString() : '')
 const end = computed(() => value.value ? new Date(value.value[1]).toLocaleDateString() : '')
 
-console.log(provides.disableDates)
 function disableDates(ts: number) {
     let disable = false
 

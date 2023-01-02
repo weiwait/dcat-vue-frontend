@@ -4,11 +4,7 @@ export type BaseField = {
     value: any,
     attributes: any,
     disabled: Array<string | number>,
-    options: {
-        accept: {
-            mimeTypes: string,
-        }
-    },
+    options: any,
     checked: Array<string | number>,
     watch: Array<any>,
     obs: {

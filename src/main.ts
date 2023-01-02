@@ -1,12 +1,11 @@
 import {createApp} from 'vue'
 import App from './App.vue'
-// import App from './TinyMce.vue'
-// import {createPinia} from "pinia";
 import FieldRegister from './FieldRegister'
+import {SinglePinia} from "@/use/Utils";
 
 const register = function () {
     const app = createApp(App)
-    // app.use(createPinia())
+    app.use(SinglePinia.getPinia())
     FieldRegister(app)
 
     return app

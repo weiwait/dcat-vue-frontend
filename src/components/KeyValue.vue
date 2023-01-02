@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import {ref, inject, unref, onMounted} from "vue";
+import {ref, inject, unref, onMounted, toRef} from "vue";
 import {NDynamicInput, NInput} from "naive-ui";
 import type {BaseField} from "@/component";
 import {useNum2el} from "@/use/Utils";
+import {storeToRefs} from "pinia";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field extends BaseField {
     is_sortable: boolean,
@@ -15,9 +17,10 @@ interface Field extends BaseField {
 }
 
 const provides = inject<Field>('provides')!
-
-const value = ref(provides.value)
 const name = ref(provides.name)
+const value = ref(provides.value)
+
+useFormStore().setField(name, value)
 
 function reBuildIndex(uv: any) {
     value.value = uv.map((item: any, i: number) => {
