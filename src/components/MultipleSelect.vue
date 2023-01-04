@@ -6,7 +6,7 @@ import {useFormStore} from "@/use/FormStore";
 import {empty} from "@/use/Utils";
 
 interface Field extends BaseField {
-    value: string|null,
+    value: []|null,
     optionsFromKeyValueField: string,
     options: [],
     concatSeparator: string,
@@ -46,16 +46,13 @@ onMounted(() => {
         :placeholder="provides.placeholder"
         :options="options"
         :to="placement"
+        multiple
     />
 
-    <input v-if="provides.attributes.required"
-           type="text"
-           :required="empty(value)"
-           :disabled="!empty(value)"
-           :name="`${name}_is_required`"
-           style="display: none;">
+    <input v-if="provides.attributes.required" type="text" :required="empty(value)" :disabled="!empty(value)"
+           :name="`${name}_is_required`" style="display: none;">
 
-    <input type="hidden" :name="name" :value="value">
+    <input v-for="item in value" type="hidden" :name="name + '[]'" :value="item">
 </template>
 
 <style scoped lang="scss">
