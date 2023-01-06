@@ -32,7 +32,7 @@ const min = ref(provides.min)
            :name="`${name}_is_required`" style="display: none;">
 
     <input v-for="item in value" type="hidden" :name="name + '[values][]'" :value="item">
-    <input v-if="!value.length" type="hidden" :name="name" value="_def_">
+    <input v-if="!value.length" type="hidden" :name="name + '[values][_def_]'">
 </template>
 
 <style scoped lang="scss">

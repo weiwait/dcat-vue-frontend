@@ -37,7 +37,7 @@ export const useUploader = <any>{
     cos(file: File | Blob, filename: string, percentage: Ref, config: any) {
         const fd = new FormData()
         fd.append('Key', filename)
-        fd.append('Signature', config.auth.Credentials.Token)
+        fd.append('Signature', config.auth.token)
         fd.append('file', file, filename)
 
         return axios.post(config.host, fd, {
