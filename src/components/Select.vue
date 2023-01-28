@@ -25,11 +25,11 @@ if (provides.optionsFromKeyValueField) {
     useFormStore().watchField(provides.optionsFromKeyValueField, (nv: any) => {
         options.value = nv?.filter((item: any) => !!item.value).map((item: any) => ({label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` :item.value, value: item.key}))
     })
-}
 
-onUnmounted(() => {
-    useFormStore().cleanupWatch(provides.optionsFromKeyValueField)
-})
+    onUnmounted(() => {
+        useFormStore().cleanupWatch(provides.optionsFromKeyValueField)
+    })
+}
 
 const placement = ref<any>('body')
 

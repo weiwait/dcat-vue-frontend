@@ -41,7 +41,7 @@ function onUpdate(uv: any) {
 }
 
 onMounted(() => {
-    reBuildIndex(value.value)
+    provides.is_serial && reBuildIndex(value.value)
 })
 
 </script>
