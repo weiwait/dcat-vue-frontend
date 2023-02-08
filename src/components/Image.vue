@@ -48,6 +48,7 @@ interface Field {
     value: Array<string>
     attributes: any,
     help: { icon: string, text: string },
+    disableCropper: boolean,
 }
 
 const provides = inject<Field>('provides')!
@@ -100,9 +101,13 @@ async function closeCropper(clear: boolean = true) {
 }
 
 function settledFileHandler(file: SettledFileInfo) {
-    cropping(URL.createObjectURL(file.file!)).then(blob => {
-        let index = currentIndex.value
+    let index = currentIndex.value
 
+    if (provides.disableCropper) {
+        return withoutCropper(file, index)
+    }
+
+    cropping(URL.createObjectURL(file.file!)).then(blob => {
         if (blob instanceof Blob) {
             const filename = file.name = provides.dir + '/' + useRandomName(file.name, type)
 
@@ -118,17 +123,7 @@ function settledFileHandler(file: SettledFileInfo) {
         }
 
         if ('original' === blob) {
-            const filename = file.name = provides.dir + '/' + useRandomName(file.name)
-
-            const preview = URL.createObjectURL(file.file!)
-
-            if (null === index) {
-                index = previews.value.push(preview) - 1;
-            } else {
-                previews.value.splice(index, 1, preview)
-            }
-
-            upload(file.file!, filename, index)
+            withoutCropper(file, index)
         }
 
         multipleQueue.shift()
@@ -139,6 +134,20 @@ function settledFileHandler(file: SettledFileInfo) {
         file.status = 'error'
         console.log(e)
     })
+}
+
+function withoutCropper(file: SettledFileInfo, index: number|null) {
+    const filename = file.name = provides.dir + '/' + useRandomName(file.name)
+
+    const preview = URL.createObjectURL(file.file!)
+
+    if (null === index) {
+        index = previews.value.push(preview) - 1;
+    } else {
+        previews.value.splice(index, 1, preview)
+    }
+
+    upload(file.file!, filename, index)
 }
 
 async function upload(file: File | Blob, filename: string, current: number) {
