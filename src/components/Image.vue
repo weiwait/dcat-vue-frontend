@@ -46,11 +46,14 @@ interface Field {
     dir: string,
     multiple: boolean,
     value: Array<string>
-    attributes: any
+    attributes: any,
+    help: { icon: string, text: string },
 }
 
 const provides = inject<Field>('provides')!
 const type = provides.options.quality ? 'jpg' : 'png'
+
+console.log(provides)
 
 const value = ref(provides.value || [])
 const name = ref(provides.name)
@@ -251,6 +254,10 @@ function dragoverHandler(index: number) {
             </n-upload-dragger>
         </n-upload>
     </n-space>
+
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
 
     <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
            :name="`${name}_is_required`" style="display: none;">

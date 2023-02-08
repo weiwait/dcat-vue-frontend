@@ -62,6 +62,10 @@ onMounted(() => {
         multiple
     />
 
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
+
     <input v-if="provides.attributes.required" type="text" :required="empty(value)" :disabled="!empty(value)"
            :name="`${name}_is_required`" style="display: none;">
 

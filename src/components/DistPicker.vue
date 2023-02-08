@@ -202,6 +202,10 @@ onUnmounted(() => {
 
     <div v-if="!provides.disableMap" :id="provides.areaId" class="map-container"></div>
 
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
+
     <input v-if="provides.provinceField" type="hidden" :name="provides.provinceField" :value="province">
     <input v-if="provides.cityField" type="hidden" :name="provides.cityField" :value="city">
     <input v-if="provides.districtField" type="hidden" :name="provides.districtField" :value="district">

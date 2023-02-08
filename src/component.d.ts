@@ -24,4 +24,5 @@ export type BaseField = {
     dir: string,
     multiple: boolean,
     mountId: string,
+    help: {icon: string, text: string},
 }

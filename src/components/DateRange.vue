@@ -52,6 +52,10 @@ function disableDates(ts: number) {
         </n-grid-item>
     </n-grid>
 
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
+
     <input v-if="provides.attributes.required" type="text" :required="!start" :disabled="!!start"
            :name="`${column.start}_is_required`" style="display: none;">
 

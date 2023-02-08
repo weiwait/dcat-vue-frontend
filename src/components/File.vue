@@ -35,6 +35,7 @@ interface Field {
     multiple: boolean,
     value: Array<string>,
     attributes: any,
+    help: {icon: string, text: string},
 }
 
 const provides = inject<Field>('provides')!
@@ -127,6 +128,10 @@ function clearFile(index: number) {
     <n-space class="file-list-wrap" v-for="(item, index) of value">
         <n-tag :closable="true" type="success" @close="clearFile(index)">{{ item }}</n-tag>
     </n-space>
+
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
 
     <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
     <input v-else v-for="item of value" type="hidden" :name="name" :value="item">

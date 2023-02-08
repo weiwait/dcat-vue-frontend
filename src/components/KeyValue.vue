@@ -90,6 +90,10 @@ onMounted(() => {
         </template>
     </template>
 
+    <span class="help-block" v-if="provides.help">
+        <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
+    </span>
+
     <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
            :name="`${name}_is_required`" style="display: none;">
 
