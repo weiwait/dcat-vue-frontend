@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, inject} from "vue";
-import {NUpload, NUploadDragger, NText, NSpace, NProgress, NTag, NGrid, NGridItem, useNotification} from "naive-ui";
+import {NUpload, NUploadDragger, NText, NSpace, NProgress, NTag, useNotification} from "naive-ui";
 import type {UploadCustomRequestOptions} from 'naive-ui'
 import {useRandomName} from "@/use/RandomName";
 import axios from "axios";
@@ -108,10 +108,6 @@ function clearFile(index: number) {
 </script>
 
 <template>
-<!--    <n-grid :cols="2">-->
-<!--        <n-grid-item>-->
-<!--        </n-grid-item>-->
-<!--    </n-grid>-->
     <n-space>
         <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
             <n-upload-dragger>
