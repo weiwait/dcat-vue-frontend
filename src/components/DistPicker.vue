@@ -8,6 +8,7 @@ import {
 } from "naive-ui";
 import axios from "axios";
 import {WeMap} from "@/use/Maps";
+import {empty} from "@/use/Utils";
 
 interface Field {
     mountId: string,
@@ -31,6 +32,7 @@ interface Field {
         ll2address: string,
         regions: string,
     },
+    help: { icon: string, text: string },
 }
 
 const provides = inject<Field>('provides')!
@@ -202,7 +204,7 @@ onUnmounted(() => {
 
     <div v-if="!provides.disableMap" :id="provides.areaId" class="map-container"></div>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

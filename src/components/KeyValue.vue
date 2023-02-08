@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {ref, inject, unref, onMounted, toRef} from "vue";
+import {ref, inject, unref, onMounted} from "vue";
 import {NDynamicInput, NInput} from "naive-ui";
 import type {BaseField} from "@/component";
 import {useNum2el} from "@/use/Utils";
-import {storeToRefs} from "pinia";
 import {useFormStore} from "@/use/FormStore";
+import {empty} from "@/use/Utils";
 
 interface Field extends BaseField {
     is_sortable: boolean,
@@ -90,7 +90,7 @@ onMounted(() => {
         </template>
     </template>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

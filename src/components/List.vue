@@ -2,6 +2,7 @@
 import {ref, inject} from "vue";
 import {NDynamicInput} from "naive-ui";
 import type {BaseField} from "@/component";
+import {empty} from "@/use/Utils";
 
 interface Field extends BaseField {
     max: NumberConstructor,
@@ -28,7 +29,7 @@ const min = ref(provides.min)
         :max="max"
     />
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

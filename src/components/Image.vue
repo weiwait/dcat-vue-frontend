@@ -13,6 +13,7 @@ import axios from "axios";
 import {useUploader} from "@/use/Uploader";
 import Cropper from "@/components/Cropper.vue";
 import type {SettledFileInfo} from "naive-ui/es/upload/src/interface";
+import {empty} from "@/use/Utils";
 
 const notification = useNotification()
 
@@ -264,7 +265,7 @@ function dragoverHandler(index: number) {
         </n-upload>
     </n-space>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

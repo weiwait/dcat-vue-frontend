@@ -57,7 +57,7 @@ export class SinglePinia {
     }
 }
 
-export const empty = function (data: any) {
+export const empty = function (data: any): boolean {
     if(typeof(data) === 'number' || typeof(data) === 'boolean')
     {
         return false;

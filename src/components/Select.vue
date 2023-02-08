@@ -48,7 +48,7 @@ onMounted(() => {
         :to="placement"
     />
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

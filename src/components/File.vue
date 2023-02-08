@@ -5,6 +5,7 @@ import type {UploadCustomRequestOptions} from 'naive-ui'
 import {useRandomName} from "@/use/RandomName";
 import axios from "axios";
 import {useUploader} from "@/use/Uploader";
+import {empty} from "@/use/Utils";
 
 interface Field {
     options: {
@@ -107,20 +108,22 @@ function clearFile(index: number) {
 </script>
 
 <template>
-    <n-grid :cols="2">
-        <n-grid-item>
-            <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
-                <n-upload-dragger>
-                    <div style="margin-bottom: 12px">
-                        <n-progress type="circle" :percentage="percentage"/>
-                    </div>
-                    <n-text style="font-size: 16px">
-                        点击或者拖动文件到该区域来上传
-                    </n-text>
-                </n-upload-dragger>
-            </n-upload>
-        </n-grid-item>
-    </n-grid>
+<!--    <n-grid :cols="2">-->
+<!--        <n-grid-item>-->
+<!--        </n-grid-item>-->
+<!--    </n-grid>-->
+    <n-space>
+        <n-upload :custom-request="customRequest" :multiple="provides.multiple" :show-file-list="false" :accept="provides.options.accept?.mimeTypes">
+            <n-upload-dragger>
+                <div style="margin-bottom: 12px">
+                    <n-progress type="circle" :percentage="percentage"/>
+                </div>
+                <n-text style="font-size: 16px">
+                    点击或者拖动文件到该区域来上传
+                </n-text>
+            </n-upload-dragger>
+        </n-upload>
+    </n-space>
 
     <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
            :name="`${name}_is_required`" style="display: none;">
@@ -129,7 +132,7 @@ function clearFile(index: number) {
         <n-tag :closable="true" type="success" @close="clearFile(index)">{{ item }}</n-tag>
     </n-space>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
@@ -140,6 +143,6 @@ function clearFile(index: number) {
 
 <style scoped lang="scss">
 .file-list-wrap {
-    margin-top: 2px!important;
+    margin-top: 6px!important;
 }
 </style>

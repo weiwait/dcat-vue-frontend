@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {ref, inject, nextTick, watch, computed} from "vue";
+import {ref, inject, computed} from "vue";
 import {
     NDatePicker,
     NGrid,
     NGridItem,
 } from "naive-ui";
+import {empty} from "@/use/Utils";
 
 interface Field {
     options: Array<string>,
@@ -14,6 +15,7 @@ interface Field {
     value: [number, number],
     attributes: any,
     disableDates: [{start: string|number, end: string|number}],
+    help: { icon: string, text: string },
 }
 
 const provides = inject<Field>('provides')!
@@ -52,7 +54,7 @@ function disableDates(ts: number) {
         </n-grid-item>
     </n-grid>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 

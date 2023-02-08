@@ -3,14 +3,11 @@ import {ref, inject, nextTick, watch, computed} from "vue";
 import {
     NDynamicTags,
     NButton,
-    NIcon,
-    NText,
     NAutoComplete,
 } from "naive-ui";
 
 import type {AutoCompleteInst} from 'naive-ui'
-
-import {Add} from '@vicons/ionicons5'
+import {empty} from "@/use/Utils";
 
 interface Field {
     options: Array<string>,
@@ -38,9 +35,12 @@ interface Field {
     value: Array<string>
     attributes: any,
     max: number | undefined,
+    help: { icon: string, text: string },
 }
 
 const provides = inject<Field>('provides')!
+
+console.log(provides)
 
 const name = ref(provides.name)
 
@@ -98,7 +98,7 @@ const options = computed(() => {
         </template>
     </n-dynamic-tags>
 
-    <span class="help-block" v-if="provides.help">
+    <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
