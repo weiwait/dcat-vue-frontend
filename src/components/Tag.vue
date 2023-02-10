@@ -40,8 +40,6 @@ interface Field {
 
 const provides = inject<Field>('provides')!
 
-console.log(provides)
-
 const name = ref(provides.name)
 
 const tags = ref(provides.value || [])

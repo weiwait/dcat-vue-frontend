@@ -55,8 +55,6 @@ interface Field {
 const provides = inject<Field>('provides')!
 const type = provides.options.quality ? 'jpg' : 'png'
 
-console.log(provides)
-
 const value = ref(provides.value || [])
 const name = ref(provides.name)
 
@@ -113,7 +111,6 @@ function settledFileHandler(file: SettledFileInfo) {
             const filename = file.name = provides.dir + '/' + useRandomName(file.name, type)
 
             const preview = URL.createObjectURL(blob)
-
             if (null === index) {
                 index = previews.value.push(preview) - 1;
             } else {
@@ -209,7 +206,7 @@ function editing(index: number) {
             upload(blob, filename, index)
         }
 
-        closeCropper()
+        closeCropper(false)
     })
 }
 
@@ -276,8 +273,13 @@ function dragoverHandler(index: number) {
     <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
     <input v-if="!value.length" type="hidden" :name="name" :value="''">
 
-    <cropper v-if="showCropper" :src="currentSrc" :resolve-cropped="resolveCropped" :replace="replace" :remove="remove"
-             :options="provides.options"></cropper>
+    <cropper v-if="showCropper"
+             :src="currentSrc"
+             :resolve-cropped="resolveCropped"
+             :replace="replace"
+             :remove="remove"
+             :options="provides.options"
+    ></cropper>
 </template>
 
 <style scoped lang="scss">
