@@ -6,7 +6,7 @@ import {useFormStore} from "@/use/FormStore";
 import {empty} from "@/use/Utils";
 
 interface Field extends BaseField {
-    value: [] | null,
+    value: never[] | null | undefined,
     optionsFromKeyValueField: string,
     options: [],
     concatSeparator: string,
@@ -37,6 +37,8 @@ if (provides.optionsFromKeyValueField) {
                     value: item.key
                 })
             )
+
+            value.value = value.value?.filter((item: any) => options.value?.some((option: any) => option.value === item))
         })
 }
 
@@ -70,6 +72,7 @@ onMounted(() => {
            :name="`${name}_is_required`" style="display: none;">
 
     <input v-for="item in value" type="hidden" :name="name + '[]'" :value="item">
+    <input v-if="!value" type="hidden" :name="name" :value="[]">
 </template>
 
 <style scoped lang="scss">

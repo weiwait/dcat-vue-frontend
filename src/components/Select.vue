@@ -23,7 +23,18 @@ options.value = provides.options.map((label: any, value: any) => ({label: provid
 
 if (provides.optionsFromKeyValueField) {
     useFormStore().watchField(provides.optionsFromKeyValueField, (nv: any) => {
-        options.value = nv?.filter((item: any) => !!item.value).map((item: any) => ({label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` :item.value, value: item.key}))
+        // 过滤空值，封装数据为naive组件的依赖格式
+        options.value = nv?.filter((item: any) => !!item.value).map((item: any) =>
+            ({
+                label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` :item.value,
+                value: item.key
+            })
+        )
+
+        // 当前选中值不在选项中，清除当前值(选项存在覆盖行为)
+        if (!options.value?.some((item: any) => item.value === value.value)) {
+            value.value = null
+        }
     })
 
     onUnmounted(() => {
