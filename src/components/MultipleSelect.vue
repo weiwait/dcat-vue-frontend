@@ -19,7 +19,7 @@ const value = ref(provides.value)
 const name = ref(provides.name)
 const options = ref()
 
-options.value = provides.options.map(
+options.value = provides.options?.map(
     (label: any, value: any) => ({
         label: provides.concatSeparator ? `${value}${provides.concatSeparator}${label}` : label,
         value

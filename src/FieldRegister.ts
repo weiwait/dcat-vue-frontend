@@ -8,6 +8,7 @@ import KeyValue from './components/KeyValue.vue'
 import DistPicker from './components/DistPicker.vue'
 import Select from './components/Select.vue'
 import MultipleSelect from './components/MultipleSelect.vue'
+import NumberComponent from './components/Number.vue'
 import type {App} from "vue";
 
 
@@ -22,6 +23,7 @@ export default function registerFields(app: App) {
         .component('DistPicker', DistPicker)
         .component('Select', Select)
         .component('MultipleSelect', MultipleSelect)
+        .component('Number', NumberComponent)
 
     return app
 }
