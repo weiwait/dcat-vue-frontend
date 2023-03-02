@@ -11,7 +11,7 @@ import {WeMap} from "@/use/Maps";
 import {empty} from "@/use/Utils";
 
 interface Field {
-    mountId: string,
+    vid: string,
     value: any,
     areaId: string;
     options: Array<string>,

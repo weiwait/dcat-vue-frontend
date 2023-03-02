@@ -3,6 +3,7 @@ import {ref, inject} from "vue";
 import {NInputNumber} from "naive-ui";
 import type {BaseField} from "@/component";
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field extends BaseField {
     value: number|null,
@@ -25,6 +26,8 @@ const provides = inject<Field>('provides')!
 
 const value = ref(provides.value)
 const name = ref(provides.name)
+
+useFormStore().setField(provides.vid, value)
 </script>
 
 <template>

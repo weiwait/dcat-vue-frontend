@@ -15,12 +15,26 @@ export default defineConfig({
     },
     build: {
         minify: true,
-        outDir: '/Users/weiwait/PhpstormProjects/dcat-admin-extension/public/vendor/dcat-admin-extensions/weiwait/dcat-vue',
+        chunkSizeWarningLimit: 2048,
+        outDir: '/Users/weiwait/PhpstormProjects/dcat-admin-extension/public',
         rollupOptions: {
+            // input: 'src/index.ts',
             output: {
-                assetFileNames: 'css/index.css',
-                entryFileNames: 'js/bundle.js',
-                chunkFileNames: chunkInfo => 'main' === chunkInfo.name ? `js/index.js` : ''
+                manualChunks: id => {
+                    if (id.includes('src/main')) {
+                        return 'index'
+                    }
+
+                    // if (id.includes('src/components')) {
+                    //     const match = /src\/components\/(.*)\.vue/.exec(id)
+                    //     if (match && match.length > 1) {
+                    //         return match[1]
+                    //     }
+                    // }
+                },
+                assetFileNames: 'vendor/dcat-admin-extensions/weiwait/dcat-vue/css/index.css',
+                entryFileNames: 'vendor/dcat-admin-extensions/weiwait/dcat-vue/js/bundle.js',
+                chunkFileNames: chunkInfo => `vendor/dcat-admin-extensions/weiwait/dcat-vue/js/${chunkInfo.name}.js`,
             }
         },
     }

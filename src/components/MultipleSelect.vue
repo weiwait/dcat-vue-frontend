@@ -49,7 +49,7 @@ onUnmounted(() => {
 const placement = ref<any>('body')
 
 onMounted(() => {
-    placement.value = document.getElementById(provides.mountId)!.closest('.layui-layer.layui-layer-page') || 'body'
+    placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })
 </script>
 

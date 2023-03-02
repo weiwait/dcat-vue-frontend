@@ -12,7 +12,8 @@ interface FormField {
 
 export const useFormStore = defineStore('form', () => {
     const fields = reactive<any>({})
-    const watchs = reactive<any>({})
+    const watches = reactive<any>({})
+    const delays: any = {}
 
     function setField(name: string|Ref, value: Ref) {
         const sn: string = unref(name)
@@ -20,6 +21,12 @@ export const useFormStore = defineStore('form', () => {
         fields[sn] = reactive<FormField>({
             name: sn, origin: unref(value), value, changed: []
         })
+
+        if (undefined !== delays[sn]) {
+            watching(sn, delays[sn])
+
+            delays[sn] = undefined
+        }
     }
 
     function getField(name: string|Ref, defaultValue: any = undefined) {
@@ -34,16 +41,23 @@ export const useFormStore = defineStore('form', () => {
 
     function watchField(name: string|Ref, handler: Function) {
         const sn: string = unref(name)
-        handler(fields[sn].value)
 
-        watchs[sn] = watch(() => fields[sn].value, () => {
+        if (fields[sn]) {
+            watching(sn, handler)
+        } else {
+            delays[sn] = handler
+        }
+    }
+
+    function watching(sn: string, handler: Function) {
+        watches[sn] = watch(() => fields[sn].value, () => {
             handler(fields[sn].value)
         }, {deep: true})
     }
 
     function cleanupWatch(name: string|Ref) {
         const sn: string = unref(name)
-        watchs[sn] && watchs[sn]()
+        watches[sn] && watches[sn]()
     }
 
     return {setField, getField, fields, watchField, cleanupWatch}

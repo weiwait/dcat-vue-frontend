@@ -1,6 +1,6 @@
 export type BaseField = {
     name: string,
-    column: string,
+    column: string|object,
     value: any,
     attributes: any,
     disabled: Array<string | number>,
@@ -23,6 +23,6 @@ export type BaseField = {
     obs_config_url: string,
     dir: string,
     multiple: boolean,
-    mountId: string,
     help: {icon: string, text: string},
+    vid: string,
 }

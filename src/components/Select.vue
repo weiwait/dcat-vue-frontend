@@ -4,6 +4,7 @@ import {NSelect} from "naive-ui";
 import type {BaseField} from "@/component";
 import {useFormStore} from "@/use/FormStore";
 import {empty} from "@/use/Utils";
+import axios from "axios";
 
 interface Field extends BaseField {
     value: string|null,
@@ -11,6 +12,15 @@ interface Field extends BaseField {
     options: [],
     concatSeparator: string,
     placeholder: string,
+    load: {
+        url: string,
+        model: string,
+        id: string,
+        field: string,
+        perPage: number,
+        filters: string[]
+    },
+    loadRefs: [{vid: string, name: string, condition: string}],
 }
 
 const provides = inject<Field>('provides')!
@@ -44,8 +54,73 @@ if (provides.optionsFromKeyValueField) {
 
 const placement = ref<any>('body')
 
+const scrolledToBottom: Function[] = []
+const loading = ref(false)
+function handleScroll(e: Event) {
+    for(const callback of scrolledToBottom) {
+        callback(e)
+    }
+}
+
+if (provides.load) {
+    let filters: any = {}
+    let nextPageUrl: string|null = null
+    let preFilters = {}
+
+    async function loadOptions() {
+        loading.value = true
+        const {data}: {data: {options: [{id: string, field: string}], nextPageUrl: string|null}} = await axios.post(
+            nextPageUrl || provides.load.url,
+            {
+                model: provides.load.model,
+                id: provides.load.id,
+                field: provides.load.field,
+                perPage: provides.load.perPage,
+                filters: filters,
+            }
+        )
+
+        if (nextPageUrl) {
+            options.value.push(...data.options.map(item => ({label: item.field, value: item.id})))
+        } else {
+            options.value = data.options.map(item => ({label: item.field, value: item.id}))
+        }
+
+        Object.assign(preFilters, filters)
+        loading.value = false
+
+        nextPageUrl = data.nextPageUrl;
+    }
+
+    provides.load.filters.forEach(filter => {
+        const ref = provides.loadRefs.find(ref => ref.name === filter)!
+
+        useFormStore().watchField(ref.vid, (nv: any) => {
+            filters[ref.condition] = nv
+            nextPageUrl = null
+
+            loadOptions()
+        })
+    })
+
+    if (provides.load.perPage > 0) {
+        scrolledToBottom.push((e: Event) => {
+            if (loading.value) return
+
+            const currentTarget = e.currentTarget as HTMLElement
+
+            console.log(currentTarget.scrollTop + currentTarget.offsetHeight)
+            console.log(currentTarget.scrollHeight - 0.5)
+
+            if (nextPageUrl && currentTarget.scrollTop + currentTarget.offsetHeight >= currentTarget.scrollHeight - 0.5) {
+                loadOptions()
+            }
+        })
+    }
+}
+
 onMounted(() => {
-    placement.value = document.getElementById(provides.mountId)!.closest('.layui-layer.layui-layer-page') || 'body'
+    placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })
 </script>
 
@@ -57,6 +132,8 @@ onMounted(() => {
         :placeholder="provides.placeholder"
         :options="options"
         :to="placement"
+        @scroll="handleScroll"
+        :loading="loading"
     />
 
     <span class="help-block" v-if="!empty(provides.help)">

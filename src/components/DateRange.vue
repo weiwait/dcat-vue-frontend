@@ -6,13 +6,12 @@ import {
     NGridItem,
 } from "naive-ui";
 import {empty} from "@/use/Utils";
+import type {BaseField} from "@/component";
 
-interface Field {
-    options: Array<string>,
+interface Field extends BaseField {
     column: {start: string, end: string},
-    disabled: Array<string | number>,
     watch: Array<any>,
-    value: [number, number],
+    value: {start: string, end: string},
     attributes: any,
     disableDates: [{start: string|number, end: string|number}],
     help: { icon: string, text: string },
@@ -21,7 +20,7 @@ interface Field {
 const provides = inject<Field>('provides')!
 const column = ref(provides.column)
 
-const value = ref<[number, number]>(provides.value)
+const value = ref<[number, number]|null>(provides.value ? [Date.parse(provides.value?.start), Date.parse(provides.value?.end)] : null)
 const start = computed(() => value.value ? new Date(value.value[0]).toLocaleDateString() : '')
 const end = computed(() => value.value ? new Date(value.value[1]).toLocaleDateString() : '')
 
