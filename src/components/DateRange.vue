@@ -20,7 +20,11 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 const column = ref(provides.column)
 
-const value = ref<[number, number]|null>(provides.value ? [Date.parse(provides.value?.start), Date.parse(provides.value?.end)] : null)
+const value = ref<[number, number]|null>(
+    provides.value.start && provides.value.end
+        ? [Date.parse(provides.value.start), Date.parse(provides.value.end)]
+        : null
+)
 const start = computed(() => value.value ? new Date(value.value[0]).toLocaleDateString() : '')
 const end = computed(() => value.value ? new Date(value.value[1]).toLocaleDateString() : '')
 
