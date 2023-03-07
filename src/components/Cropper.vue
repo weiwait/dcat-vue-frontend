@@ -1,5 +1,5 @@
 <template>
-    <n-modal v-model:show="show">
+    <n-modal v-model:show="show" @after-leave="afterLeave">
         <n-space class="modal-container" vertical :size="0">
             <div :class="['cropper-container', options.large]" ref="cropperContainer">
             </div>
@@ -93,9 +93,9 @@ function reset() {
     cropper.reset()
 }
 
-onBeforeUnmount(() => {
+function afterLeave() {
     props.resolveCropped(false)
-})
+}
 
 </script>
 

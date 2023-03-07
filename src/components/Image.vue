@@ -170,7 +170,7 @@ async function upload(file: File | Blob, filename: string, current: number) {
 
     upload.then(() => {
         if (provides.multiple) {
-            value.value.push(filename)
+            value.value[current] = filename
         } else {
             value.value = [filename]
         }
