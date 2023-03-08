@@ -9,7 +9,7 @@ import axios from "axios";
 interface Field extends BaseField {
     value: string|null,
     optionsFromKeyValueField: string,
-    options: [],
+    options: any,
     concatSeparator: string,
     placeholder: string,
     load: {
@@ -31,9 +31,20 @@ const name = ref(provides.name)
 const formStore = useFormStore()
 formStore.setField(name, value)
 
-const options = ref()
+const options = ref<{label: string, value: string}[]>([])
 
-options.value = provides.options.map((label: any, value: any) => ({label: provides.concatSeparator ? `${value}${provides.concatSeparator}${label}` : label, value}))
+if (provides.options instanceof Array) {
+    options.value = provides.options.map(
+        (label: any, value: any) => ({label: provides.concatSeparator ? `${value}${provides.concatSeparator}${label}` : label, value})
+    )
+} else {
+    for (const key in provides.options) {
+        options.value.push({
+            label: provides.options[key],
+            value: provides.concatSeparator ? `${provides.options[key]}${provides.concatSeparator}${key}` : key
+        })
+    }
+}
 
 if (provides.optionsFromKeyValueField) {
     useFormStore().watchField(provides.optionsFromKeyValueField, (nv: any) => {
