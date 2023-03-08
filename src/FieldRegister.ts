@@ -1,5 +1,5 @@
 import File from './components/File.vue'
-import CheckBox from './components/CheckBox.vue'
+import Checkbox from './components/Checkbox.vue'
 import Image from './components/Image.vue'
 import Tag from './components/Tag.vue'
 import DateRange from './components/DateRange.vue'
@@ -15,7 +15,7 @@ import type {App} from "vue";
 
 export default function registerFields(app: App) {
     app.component('File', File)
-        .component('CheckBox', CheckBox)
+        .component('Checkbox', Checkbox)
         .component('Image', Image)
         .component('Tag', Tag)
         .component('DateRange', DateRange)

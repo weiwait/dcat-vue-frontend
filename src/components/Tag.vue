@@ -8,6 +8,7 @@ import {
 
 import type {AutoCompleteInst} from 'naive-ui'
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field {
     options: Array<string>,
@@ -43,6 +44,10 @@ const provides = inject<Field>('provides')!
 const name = ref(provides.name)
 
 const tags = ref(provides.value || [])
+
+const formStore = useFormStore()
+formStore.setField(name, tags)
+
 const customInput = ref('')
 const autoCompleteInstRef = ref<AutoCompleteInst | null>(null)
 watch(autoCompleteInstRef, (value) => {

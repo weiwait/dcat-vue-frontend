@@ -17,6 +17,10 @@ const provides = inject<Field>('provides')!
 
 const value = ref(provides.value)
 const name = ref(provides.name)
+
+const formStore = useFormStore()
+formStore.setField(name, value)
+
 const options = ref()
 
 options.value = provides.options?.map(

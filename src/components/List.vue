@@ -3,6 +3,7 @@ import {ref, inject} from "vue";
 import {NDynamicInput} from "naive-ui";
 import type {BaseField} from "@/component";
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field extends BaseField {
     max: NumberConstructor,
@@ -14,6 +15,10 @@ const provides = inject<Field>('provides')!
 
 const value = ref(provides.value || [''])
 const name = ref(provides.name)
+
+const formStore = useFormStore()
+formStore.setField(name, value)
+
 const sortable = ref(provides.sortable ?? false)
 const max = ref(provides.max)
 const min = ref(provides.min)

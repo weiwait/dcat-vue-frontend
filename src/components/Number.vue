@@ -27,7 +27,7 @@ const provides = inject<Field>('provides')!
 const value = ref(provides.value)
 const name = ref(provides.name)
 
-useFormStore().setField(provides.vid, value)
+useFormStore().setField(name, value)
 </script>
 
 <template>

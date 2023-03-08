@@ -27,6 +27,10 @@ const provides = inject<Field>('provides')!
 
 const value = ref(provides.value)
 const name = ref(provides.name)
+
+const formStore = useFormStore()
+formStore.setField(name, value)
+
 const options = ref()
 
 options.value = provides.options.map((label: any, value: any) => ({label: provides.concatSeparator ? `${value}${provides.concatSeparator}${label}` : label, value}))
@@ -95,7 +99,7 @@ if (provides.load) {
     provides.load.filters.forEach(filter => {
         const ref = provides.loadRefs.find(ref => ref.name === filter)!
 
-        useFormStore().watchField(ref.vid, (nv: any) => {
+        useFormStore().watchField(filter, (nv: any) => {
             filters[ref.condition] = nv
             nextPageUrl = null
 
@@ -109,8 +113,8 @@ if (provides.load) {
 
             const currentTarget = e.currentTarget as HTMLElement
 
-            console.log(currentTarget.scrollTop + currentTarget.offsetHeight)
-            console.log(currentTarget.scrollHeight - 0.5)
+            // console.log(currentTarget.scrollTop + currentTarget.offsetHeight)
+            // console.log(currentTarget.scrollHeight - 0.5)
 
             if (nextPageUrl && currentTarget.scrollTop + currentTarget.offsetHeight >= currentTarget.scrollHeight - 0.5) {
                 loadOptions()

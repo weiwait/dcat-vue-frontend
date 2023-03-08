@@ -7,6 +7,7 @@ import {
 } from "naive-ui";
 import {empty} from "@/use/Utils";
 import type {BaseField} from "@/component";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field extends BaseField {
     column: {start: string, end: string},
@@ -21,10 +22,14 @@ const provides = inject<Field>('provides')!
 const column = ref(provides.column)
 
 const value = ref<[number, number]|null>(
-    provides.value.start && provides.value.end
+    provides.value?.start && provides.value?.end
         ? [Date.parse(provides.value.start), Date.parse(provides.value.end)]
         : null
 )
+
+const formStore = useFormStore()
+formStore.setField(column, value)
+
 const start = computed(() => value.value ? new Date(value.value[0]).toLocaleDateString() : '')
 const end = computed(() => value.value ? new Date(value.value[1]).toLocaleDateString() : '')
 

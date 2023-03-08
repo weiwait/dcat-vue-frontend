@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
-import {reactive, ref, unref, watch} from "vue";
+import {isRef, reactive, ref, unref, watch} from "vue";
 import type {Ref} from "vue"
+import axios from "axios";
 
 
 interface FormField {
@@ -15,7 +16,8 @@ export const useFormStore = defineStore('form', () => {
     const watches = reactive<any>({})
     const delays: any = {}
 
-    function setField(name: string|Ref, value: Ref) {
+    function setField(name: string|Ref, value: Ref)
+    {
         const sn: string = unref(name)
 
         fields[sn] = reactive<FormField>({
@@ -29,7 +31,8 @@ export const useFormStore = defineStore('form', () => {
         }
     }
 
-    function getField(name: string|Ref, defaultValue: any = undefined) {
+    function getField(name: string|Ref, defaultValue: any = undefined)
+    {
         const sn: string = unref(name)
 
         if (!fields[sn]) {
@@ -39,7 +42,23 @@ export const useFormStore = defineStore('form', () => {
         return fields[sn].value
     }
 
-    function watchField(name: string|Ref, handler: Function) {
+    function updateField(name: string|Ref, value: any): boolean
+    {
+        const sn = unref(name)
+
+        if (!fields[sn]) return false
+
+        if (isRef(fields[sn].value)) {
+            fields[sn].value.value = unref(value)
+        } else {
+            fields[sn].value = unref(value)
+        }
+
+        return true
+    }
+
+    function watchField(name: string|Ref, handler: Function)
+    {
         const sn: string = unref(name)
 
         if (fields[sn]) {
@@ -49,16 +68,23 @@ export const useFormStore = defineStore('form', () => {
         }
     }
 
-    function watching(sn: string, handler: Function) {
+    function watching(sn: string, handler: Function)
+    {
         watches[sn] = watch(() => fields[sn].value, () => {
             handler(fields[sn].value)
         }, {deep: true})
     }
 
-    function cleanupWatch(name: string|Ref) {
+    function cleanupWatch(name: string|Ref)
+    {
         const sn: string = unref(name)
         watches[sn] && watches[sn]()
     }
 
-    return {setField, getField, fields, watchField, cleanupWatch}
+    function load(url: string, config: object)
+    {
+        return axios.get(url, config)
+    }
+
+    return {setField, getField, watchField, cleanupWatch, updateField, load}
 })

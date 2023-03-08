@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 import {WeMap} from "@/use/Maps";
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field {
     vid: string,
@@ -46,6 +47,16 @@ const detail = ref<string | null>(values[provides.detailField] || null)
 const lat = ref<string | null>(values[provides.latField] || null)
 const lng = ref<string | null>(values[provides.lngField] || null)
 const zoom = ref<number>(values[provides.zoomField] * 1 || provides.zoom)
+
+
+const formStore = useFormStore()
+formStore.setField(provides.provinceField, province)
+formStore.setField(provides.cityField, city)
+formStore.setField(provides.districtField, district)
+formStore.setField(provides.detailField, detail)
+formStore.setField(provides.latField, lat)
+formStore.setField(provides.lngField, lng)
+formStore.setField(provides.zoomField, zoom)
 
 const regions: any = {}
 const height = provides.height

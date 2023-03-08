@@ -14,6 +14,7 @@ import {useUploader} from "@/use/Uploader";
 import Cropper from "@/components/Cropper.vue";
 import type {SettledFileInfo} from "naive-ui/es/upload/src/interface";
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 const notification = useNotification()
 
@@ -57,6 +58,9 @@ const type = provides.options.quality ? 'jpg' : 'png'
 
 const value = ref(provides.value || [])
 const name = ref(provides.name)
+
+const formStore = useFormStore()
+formStore.setField(name, value)
 
 const percentage = ref(0)
 

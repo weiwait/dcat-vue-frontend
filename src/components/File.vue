@@ -6,6 +6,7 @@ import {useRandomName} from "@/use/RandomName";
 import axios from "axios";
 import {useUploader} from "@/use/Uploader";
 import {empty} from "@/use/Utils";
+import {useFormStore} from "@/use/FormStore";
 
 interface Field {
     options: {
@@ -44,6 +45,9 @@ const provides = inject<Field>('provides')!
 const value = ref(provides.value || [])
 const name = ref(provides.name)
 const disabled = ref(provides.disabled ?? []);
+
+const formStore = useFormStore()
+formStore.setField(name, value)
 
 const percentage = ref(0)
 const notification = useNotification()
