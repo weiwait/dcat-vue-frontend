@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, inject, onMounted, onUnmounted} from "vue";
+import {ref, inject, onMounted, onUnmounted, reactive} from "vue";
 import {
     NSpace,
     NSelect,
@@ -10,8 +10,10 @@ import axios from "axios";
 import {WeMap} from "@/use/Maps";
 import {empty} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
+import type {BaseField} from "@/component";
 
-interface Field {
+interface Field extends BaseField{
     vid: string,
     value: any,
     areaId: string;
@@ -37,6 +39,8 @@ interface Field {
 }
 
 const provides = inject<Field>('provides')!
+const store = useFormStore();
+const form = store.initializer(provides.name)
 
 const values = {...provides.value}
 
@@ -48,19 +52,20 @@ const lat = ref<string | null>(values[provides.latField] || null)
 const lng = ref<string | null>(values[provides.lngField] || null)
 const zoom = ref<number>(values[provides.zoomField] * 1 || provides.zoom)
 
+form[provides.provinceField] = province
+form[provides.cityField] = city
+form[provides.districtField] = district
+form[provides.detailField] = detail
+form[provides.latField] = lat
+form[provides.lngField] = lng
+form[provides.zoomField] = zoom
 
-const formStore = useFormStore()
-formStore.setField(provides.provinceField, province)
-formStore.setField(provides.cityField, city)
-formStore.setField(provides.districtField, district)
-formStore.setField(provides.detailField, detail)
-formStore.setField(provides.latField, lat)
-formStore.setField(provides.lngField, lng)
-formStore.setField(provides.zoomField, zoom)
+form.attributes.disabled = provides.attributes.disabled || false
 
 const regions: any = {}
 const height = provides.height
 
+form.disables = ref(provides.disables || [])
 async function getRegions(pcode: string) {
     if (regions.hasOwnProperty(pcode)) {
         return regions[pcode]
@@ -69,7 +74,7 @@ async function getRegions(pcode: string) {
     const {data} = await axios.get(provides.urls.regions, {params: {pcode}})
 
     regions[pcode] = data.items.map((item: any) => {
-        if (provides.disables.includes(item.value)) {
+        if (form.disables.includes(item.value)) {
             item['disabled'] = true
         }
 
@@ -165,6 +170,8 @@ onMounted(() => {
 onUnmounted(() => {
     map?.destroy()
 })
+
+Observer.make(provides.watches)
 </script>
 
 <template>
@@ -178,6 +185,7 @@ onUnmounted(() => {
             :options="provinces"
             :consistent-menu-width="false"
             @update:value="provinceUpdatedHandler"
+            :disabled="form.attributes.disabled"
         />
         <n-select
             v-if="provides.provinceField || provides.cityField || provides.districtField"
@@ -188,6 +196,7 @@ onUnmounted(() => {
             :options="cities"
             :consistent-menu-width="false"
             @update:value="cityUpdatedHandler"
+            :disabled="form.attributes.disabled"
         />
         <n-select
             v-if="provides.provinceField || provides.cityField || provides.districtField"
@@ -198,10 +207,21 @@ onUnmounted(() => {
             :options="districts"
             :consistent-menu-width="false"
             @update:value="districtUpdatedHandler"
+            :disabled="form.attributes.disabled"
         />
         <n-input-group v-if="provides.latField">
-            <n-input placeholder="纬度" v-model:value="lat" @keydown.enter.prevent="latUpdatedHandler"></n-input>
-            <n-input placeholder="经度" v-model:value="lng" @keydown.enter.prevent="lngUpdatedHandler"></n-input>
+            <n-input
+                placeholder="纬度"
+                v-model:value="lat"
+                @keydown.enter.prevent="latUpdatedHandler"
+                :disabled="form.attributes.disabled"
+            ></n-input>
+            <n-input
+                placeholder="经度"
+                v-model:value="lng"
+                @keydown.enter.prevent="lngUpdatedHandler"
+                :disabled="form.attributes.disabled"
+            ></n-input>
         </n-input-group>
     </n-space>
 
@@ -211,6 +231,7 @@ onUnmounted(() => {
              clearable
              style="margin-top: 18px; min-width: 50%;"
              @keydown.enter.prevent="detailUpdatedHandler"
+             :disabled="form.attributes.disabled"
     ></n-input>
 
     <div v-if="!provides.disableMap" :id="provides.areaId" class="map-container"></div>

@@ -7,18 +7,15 @@ import axios from "axios";
 import {useUploader} from "@/use/Uploader";
 import {empty} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
+import type {BaseField} from "@/component";
 
-interface Field {
+interface Field extends BaseField {
     options: {
         accept: {
             mimeTypes: string,
         }
     },
-    column: string,
-    name: string,
-    checked: Array<string | number>,
-    disabled: Array<string | number>,
-    watch: Array<any>,
     obs: {
         oss: {
             dir: string,
@@ -35,19 +32,14 @@ interface Field {
     obs_config_url: string,
     dir: string,
     multiple: boolean,
-    value: Array<string>,
-    attributes: any,
-    help: {icon: string, text: string},
 }
 
 const provides = inject<Field>('provides')!
+const store = useFormStore()
 
-const value = ref(provides.value || [])
-const name = ref(provides.name)
-const disabled = ref(provides.disabled ?? []);
-
-const formStore = useFormStore()
-formStore.setField(name, value)
+const form = store.initializer(provides.name, provides.value || [])
+form.attributes.disabled = provides.attributes.disabled || false
+form.attributes.required = provides.attributes.required || false
 
 const percentage = ref(0)
 const notification = useNotification()
@@ -82,9 +74,9 @@ const customRequest = async ({file}: UploadCustomRequestOptions) => {
     upload.then(() => {
         file.status = 'finished'
         if (provides.multiple) {
-            value.value.push(filename)
+            form.value.push(filename)
         } else {
-            value.value = [filename]
+            form.value = [filename]
         }
 
         useUploader.uploaded(provides.uploaded_url, filename, disk)
@@ -106,9 +98,10 @@ const customRequest = async ({file}: UploadCustomRequestOptions) => {
 }
 
 function clearFile(index: number) {
-    value.value.splice(index, 1)
+    form.value.splice(index, 1)
 }
 
+Observer.make(provides.watches)
 </script>
 
 <template>
@@ -125,10 +118,10 @@ function clearFile(index: number) {
         </n-upload>
     </n-space>
 
-    <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
-           :name="`${name}_is_required`" style="display: none;">
+    <input v-if="form.attributes.required" type="text" :required="!form.value.length" :disabled="!!form.value.length"
+           :name="`${form.name}_is_required`" style="display: none;">
 
-    <n-space class="file-list-wrap" v-for="(item, index) of value">
+    <n-space class="file-list-wrap" v-for="(item, index) of form.value">
         <n-tag :closable="true" type="success" @close="clearFile(index)">{{ item }}</n-tag>
     </n-space>
 
@@ -136,9 +129,9 @@ function clearFile(index: number) {
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
-    <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
-    <input v-if="!value.length" type="hidden" :name="name" :value="''">
+    <input v-if="provides.multiple" v-for="item of form.value" type="hidden" :name="form.name + '[]'" :value="item">
+    <input v-else v-for="item of form.value" type="hidden" :name="form.name" :value="item">
+    <input v-if="!form.value.length" type="hidden" :name="form.name" :value="''">
 </template>
 
 <style scoped lang="scss">

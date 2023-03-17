@@ -5,6 +5,7 @@ import type {BaseField} from "@/component";
 import {useFormStore} from "@/use/FormStore";
 import {empty} from "@/use/Utils";
 import axios from "axios";
+import {Observer} from "@/use/useTraits";
 
 interface Field extends BaseField {
     value: string|null,
@@ -24,22 +25,19 @@ interface Field extends BaseField {
 }
 
 const provides = inject<Field>('provides')!
+const store = useFormStore()
 
-const value = ref(provides.value)
-const name = ref(provides.name)
-
-const formStore = useFormStore()
-formStore.setField(name, value)
-
-const options = ref<{label: string, value: string}[]>([])
+const form = store.initializer(provides.name, provides.value)
+form.attributes.disabled = provides.attributes.disabled || false
+form.attributes.required = provides.attributes.required || false
 
 if (provides.options instanceof Array) {
-    options.value = provides.options.map(
+    form.options = provides.options.map(
         (label: any, value: any) => ({label: provides.concatSeparator ? `${value}${provides.concatSeparator}${label}` : label, value})
     )
 } else {
     for (const key in provides.options) {
-        options.value.push({
+        form.options.push({
             label: provides.options[key],
             value: provides.concatSeparator ? `${provides.options[key]}${provides.concatSeparator}${key}` : key
         })
@@ -47,9 +45,9 @@ if (provides.options instanceof Array) {
 }
 
 if (provides.optionsFromKeyValueField) {
-    useFormStore().watchField(provides.optionsFromKeyValueField, (nv: any) => {
+    store.watchField(provides.optionsFromKeyValueField, (nv: any) => {
         // 过滤空值，封装数据为naive组件的依赖格式
-        options.value = nv?.filter((item: any) => !!item.value).map((item: any) =>
+        form.options = nv?.filter((item: any) => !!item.value).map((item: any) =>
             ({
                 label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` :item.value,
                 value: item.key
@@ -57,8 +55,8 @@ if (provides.optionsFromKeyValueField) {
         )
 
         // 当前选中值不在选项中，清除当前值(选项存在覆盖行为)
-        if (!options.value?.some((item: any) => item.value === value.value)) {
-            value.value = null
+        if (!form.options?.some((item: any) => item.value === form.value)) {
+            form.value = null
         }
     })
 
@@ -96,9 +94,9 @@ if (provides.load) {
         )
 
         if (nextPageUrl) {
-            options.value.push(...data.options.map(item => ({label: item.field, value: item.id})))
+            form.options.push(...data.options.map(item => ({label: item.field, value: item.id})))
         } else {
-            options.value = data.options.map(item => ({label: item.field, value: item.id}))
+            form.options = data.options.map(item => ({label: item.field, value: item.id}))
         }
 
         Object.assign(preFilters, filters)
@@ -137,32 +135,35 @@ if (provides.load) {
 onMounted(() => {
     placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })
+
+Observer.make(provides.watches)
 </script>
 
 <template>
     <n-select
-        v-model:value="value"
+        v-model:value="form.value"
         filterable
         clearable
         :placeholder="provides.placeholder"
-        :options="options"
+        :options="form.options"
         :to="placement"
         @scroll="handleScroll"
         :loading="loading"
+        :disabled="form.attributes.disabled"
     />
 
     <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.attributes.required"
+    <input v-if="form.attributes.required"
            type="text"
-           :required="empty(value)"
-           :disabled="!empty(value)"
-           :name="`${name}_is_required`"
+           :required="empty(form.value)"
+           :disabled="!empty(form.value)"
+           :name="`${form.name}_is_required`"
            style="display: none;">
 
-    <input type="hidden" :name="name" :value="value">
+    <input type="hidden" :name="form.name" :value="form.value">
 </template>
 
 <style scoped lang="scss">

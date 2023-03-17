@@ -8,6 +8,7 @@ import {
 import {empty} from "@/use/Utils";
 import type {BaseField} from "@/component";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
 
 interface Field extends BaseField {
     column: {start: string, end: string},
@@ -19,46 +20,52 @@ interface Field extends BaseField {
 }
 
 const provides = inject<Field>('provides')!
-const column = ref(provides.column)
 
-const value = ref<[number, number]|null>(
-    provides.value?.start && provides.value?.end
+const store = useFormStore()
+const form = store.initializer(provides.name)
+
+form.value = provides.value?.start && provides.value?.end
         ? [Date.parse(provides.value.start), Date.parse(provides.value.end)]
         : null
-)
 
-const formStore = useFormStore()
-formStore.setField(column, value)
+form.attributes.disabled = provides.attributes.disabled || false
 
-const start = computed(() => value.value ? new Date(value.value[0]).toLocaleDateString() : '')
-const end = computed(() => value.value ? new Date(value.value[1]).toLocaleDateString() : '')
+const start = computed(() => form.value ? new Date(form.value[0]).toLocaleDateString() : '')
+const end = computed(() => form.value ? new Date(form.value[1]).toLocaleDateString() : '')
 
-function disableDates(ts: number) {
-    let disable = false
+form[provides.column.start] = start
+form[provides.column.end] = end
 
-    if (provides.disableDates) {
-        disable = provides.disableDates.some(item => {
-            if (item.start && item.end) { // 禁区间
-                return ts >= new Date(item.start).getTime() && ts <= new Date(item.end).getTime()
-            } else if (item.start) { // 禁未来
-                return ts >= new Date(item.start).getTime()
-            } else if (item.end) { // 禁过去
-                return  ts <= new Date(item.end).getTime()
-            }
+form.disableDates = ref(provides.disableDates || [])
 
-            return false
-        })
-    }
+function disableDates(ts: number): boolean
+{
+    return form.disableDates.some((item: {start: string, end: string}) => {
+        if (item.start && item.end) { // 禁区间
+            return ts >= new Date(item.start).getTime() && ts <= new Date(item.end).getTime()
+        } else if (item.start) { // 禁未来
+            return ts >= new Date(item.start).getTime()
+        } else if (item.end) { // 禁过去
+            return  ts <= new Date(item.end).getTime()
+        }
 
-    return disable
+        return false
+    })
 }
 
+Observer.make(provides.watches)
 </script>
 
 <template>
     <n-grid :cols="2">
         <n-grid-item>
-            <n-date-picker v-model:value="value" type="daterange" clearable :is-date-disabled="disableDates"></n-date-picker>
+            <n-date-picker
+                v-model:value="form.value"
+                type="daterange"
+                clearable
+                :is-date-disabled="disableDates"
+                :disabled="form.attributes.disabled"
+            ></n-date-picker>
         </n-grid-item>
     </n-grid>
 
@@ -67,10 +74,10 @@ function disableDates(ts: number) {
     </span>
 
     <input v-if="provides.attributes.required" type="text" :required="!start" :disabled="!!start"
-           :name="`${column.start}_is_required`" style="display: none;">
+           :name="`${provides.column.start}_is_required`" style="display: none;">
 
-    <input type="hidden" :name="column.start" :value="start">
-    <input type="hidden" :name="column.end" :value="end">
+    <input type="hidden" :name="provides.column.start" :value="start">
+    <input type="hidden" :name="provides.column.end" :value="end">
 </template>
 
 <style scoped lang="scss">

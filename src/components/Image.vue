@@ -15,10 +15,12 @@ import Cropper from "@/components/Cropper.vue";
 import type {SettledFileInfo} from "naive-ui/es/upload/src/interface";
 import {empty} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
+import type {BaseField} from "@/component";
 
 const notification = useNotification()
 
-interface Field {
+interface Field extends BaseField {
     options: {
         accept: {
             mimeTypes: string,
@@ -56,11 +58,8 @@ interface Field {
 const provides = inject<Field>('provides')!
 const type = provides.options.quality ? 'jpg' : 'png'
 
-const value = ref(provides.value || [])
-const name = ref(provides.name)
-
-const formStore = useFormStore()
-formStore.setField(name, value)
+const store = useFormStore()
+const form = store.initializer(provides.name, provides.value || [])
 
 const percentage = ref(0)
 
@@ -174,9 +173,9 @@ async function upload(file: File | Blob, filename: string, current: number) {
 
     upload.then(() => {
         if (provides.multiple) {
-            value.value[current] = filename
+            form.value[current] = filename
         } else {
-            value.value = [filename]
+            form.value = [filename]
         }
 
         useUploader.uploaded(provides.uploaded_url, filename, provides.disk).then((res: any) => {
@@ -206,7 +205,7 @@ function editing(index: number) {
         if (blob instanceof Blob) {
             previews.value[index] = URL.createObjectURL(blob)
 
-            const filename = provides.dir + '/' + useRandomName(value.value[index], type)
+            const filename = provides.dir + '/' + useRandomName(form.value[index], type)
             upload(blob, filename, index)
         }
 
@@ -216,7 +215,7 @@ function editing(index: number) {
 
 function remove() {
     if (null !== currentIndex.value) {
-        value.value.splice(currentIndex.value!, 1)
+        form.value.splice(currentIndex.value!, 1)
         previews.value.splice(currentIndex.value!, 1)
     }
 
@@ -238,12 +237,13 @@ function dragoverHandler(index: number) {
     let current = previews.value.splice(dragging.value!, 1)
     previews.value.splice(index, 0, ...current)
 
-    current = value.value.splice(dragging.value!, 1)
-    value.value.splice(index, 0, ...current)
+    current = form.value.splice(dragging.value!, 1)
+    form.value.splice(index, 0, ...current)
 
     dragging.value = index
 }
 
+Observer.make(provides.watches)
 </script>
 
 <template>
@@ -270,12 +270,12 @@ function dragoverHandler(index: number) {
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
-           :name="`${name}_is_required`" style="display: none;">
+    <input v-if="form.attributes.required" type="text" :required="!form.value.length" :disabled="!!form.value.length"
+           :name="`${form.name}_is_required`" style="display: none;">
 
-    <input v-if="provides.multiple" v-for="item of value" type="hidden" :name="name + '[]'" :value="item">
-    <input v-else v-for="item of value" type="hidden" :name="name" :value="item">
-    <input v-if="!value.length" type="hidden" :name="name" :value="''">
+    <input v-if="provides.multiple" v-for="item of form.value" type="hidden" :name="form.name + '[]'" :value="item">
+    <input v-else v-for="item of form.value" type="hidden" :name="form.name" :value="item">
+    <input v-if="!form.value.length" type="hidden" :name="form.name" :value="''">
 
     <cropper v-if="showCropper"
              :src="currentSrc"

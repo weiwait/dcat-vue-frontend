@@ -4,6 +4,7 @@ import {NInputNumber} from "naive-ui";
 import type {BaseField} from "@/component";
 import {empty} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
 
 interface Field extends BaseField {
     value: number|null,
@@ -23,16 +24,16 @@ interface Field extends BaseField {
 }
 
 const provides = inject<Field>('provides')!
+const store = useFormStore()
 
-const value = ref(provides.value)
-const name = ref(provides.name)
+const form = store.initializer(provides.name, provides.value)
 
-useFormStore().setField(name, value)
+Observer.make(provides.watches)
 </script>
 
 <template>
     <n-input-number
-        v-model:value="value"
+        v-model:value="form.value"
         :clearable="provides.clearable"
         :placeholder="provides.placeholder"
         :precision="provides.precision"
@@ -42,6 +43,7 @@ useFormStore().setField(name, value)
         :readonly="!!provides.disabled"
         :show-button="provides.showButton"
         :button-placement="provides.bothButton ? 'both' : 'right'"
+        :disabled="form.attributes.disabled"
     >
         <template #prefix style="color: #949494;">
             {{ provides.prepend }}
@@ -56,14 +58,14 @@ useFormStore().setField(name, value)
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.attributes.required"
+    <input v-if="form.attributes.required"
            type="text"
-           :required="empty(value)"
-           :disabled="!empty(value)"
-           :name="`${name}_is_required`"
+           :required="empty(form.value)"
+           :disabled="!empty(form.value)"
+           :name="`${form.name}_is_required`"
            style="display: none;">
 
-    <input type="hidden" :name="name" :value="value">
+    <input type="hidden" :name="form.name" :value="form.value">
 </template>
 
 <style scoped lang="scss">

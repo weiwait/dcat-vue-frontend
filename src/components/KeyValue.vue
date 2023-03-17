@@ -5,6 +5,7 @@ import type {BaseField} from "@/component";
 import {useNum2el} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
 import {empty} from "@/use/Utils";
+import {Observer} from "@/use/useTraits";
 
 interface Field extends BaseField {
     is_sortable: boolean,
@@ -17,13 +18,12 @@ interface Field extends BaseField {
 }
 
 const provides = inject<Field>('provides')!
-const name = ref(provides.name)
-const value = ref(provides.value)
+const store = useFormStore()
 
-useFormStore().setField(name, value)
+const form = store.initializer(provides.name, provides.value)
 
 function reBuildIndex(uv: any) {
-    value.value = uv.map((item: any, i: number) => {
+    form.value = uv.map((item: any, i: number) => {
         let key = ''
 
         if (provides.keys.length) {
@@ -41,32 +41,36 @@ function onUpdate(uv: any) {
 }
 
 onMounted(() => {
-    provides.is_serial && reBuildIndex(value.value)
+    provides.is_serial && reBuildIndex(form.value)
 })
 
+Observer.make(provides.watches)
 </script>
 
 <template>
     <template v-if="!provides.is_serial">
         <n-dynamic-input
-            v-model:value="value"
+            v-model:value="form.value"
             preset="pair"
             :key-placeholder="'请输入' + provides.keyLabel"
             :value-placeholder="'请输入值' + provides.valueLabel"
             :show-sort-button="provides.is_sortable"
+            :aria-disabled="form.attributes.disabled"
         />
 
-        <template v-for="item in value">
-            <input type="hidden" :name="name + '[keys][]'" :value="item.key">
-            <input type="hidden" :name="name + '[values][]'" :value="item.value">
+        <template v-for="item in form.value">
+            <input type="hidden" :name="form.name + '[keys][]'" :value="item.key">
+            <input type="hidden" :name="form.name + '[values][]'" :value="item.value">
         </template>
     </template>
 
     <template v-else>
         <n-dynamic-input
-            v-model:value="value"
+            v-model:value="form.value"
             :on-update:value="onUpdate"
-            :show-sort-button="provides.is_sortable">
+            :show-sort-button="provides.is_sortable"
+            :aria-disabled="form.attributes.disabled"
+        >
 
             <template #default="{ value }">
                 <div style="display: flex; align-items: center; width: 100%">
@@ -80,13 +84,13 @@ onMounted(() => {
             </template>
         </n-dynamic-input>
 
-        <template v-if="!provides.is_list" v-for="item in value">
-            <input type="hidden" :name="name + '[keys][]'" :value="item.key">
-            <input type="hidden" :name="name + '[values][]'" :value="item.value">
+        <template v-if="!provides.is_list" v-for="item in form.value">
+            <input type="hidden" :name="form.name + '[keys][]'" :value="item.key">
+            <input type="hidden" :name="form.name + '[values][]'" :value="item.value">
         </template>
 
-        <template v-else v-for="item in value">
-            <input type="hidden" :name="name + '[values][]'" :value="item.value">
+        <template v-else v-for="item in form.value">
+            <input type="hidden" :name="form.name + '[values][]'" :value="item.value">
         </template>
     </template>
 
@@ -94,10 +98,10 @@ onMounted(() => {
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.attributes.required" type="text" :required="!value.length" :disabled="!!value.length"
-           :name="`${name}_is_required`" style="display: none;">
+    <input v-if="form.attributes.required" type="text" :required="!form.value.length" :disabled="!!form.value.length"
+           :name="`${form.name}_is_required`" style="display: none;">
 
-    <input v-if="!value.length" type="hidden" :name="name" value="_def_">
+    <input v-if="!form.value.length" type="hidden" :name="form.name" value="_def_">
 </template>
 
 <style scoped lang="scss">

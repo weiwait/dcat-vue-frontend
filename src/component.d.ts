@@ -1,12 +1,16 @@
-export type BaseField = {
+export declare type BaseField = {
+    [key: string]: any,
     name: string,
     column: string|object,
     value: any,
-    attributes: any,
+    attributes: {
+        [key: string]: any,
+        disabled: boolean|undefined,
+        required: boolean|undefined,
+    },
     disabled: Array<string | number>,
     options: any,
     checked: Array<string | number>,
-    watch: Array<any>,
     obs: {
         oss: {
             dir: string,
@@ -25,4 +29,10 @@ export type BaseField = {
     multiple: boolean,
     help: {icon: string, text: string},
     vid: string,
+    watches: [{field: string, handler: string}],
+}
+
+declare interface Watch {
+    field: string,
+    handler: string,
 }

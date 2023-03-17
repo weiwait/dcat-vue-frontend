@@ -9,44 +9,15 @@ import {
 import type {AutoCompleteInst} from 'naive-ui'
 import {empty} from "@/use/Utils";
 import {useFormStore} from "@/use/FormStore";
+import {Observer} from "@/use/useTraits";
+import type {BaseField} from "@/component";
 
-interface Field {
-    options: Array<string>,
-    column: string,
-    name: string,
-    checked: Array<string | number>,
-    disabled: Array<string | number>,
-    watch: Array<any>,
-    obs: {
-        oss: {
-            dir: string,
-            policy: string,
-            accessid: string,
-            expire: number,
-            host: string,
-            signature: string,
-            callback: string,
-        }
-    },
-    disk: any,
-    uploaded_url: string,
-    obs_config_url: string,
-    dir: string,
-    multiple: boolean,
-    value: Array<string>
-    attributes: any,
-    max: number | undefined,
-    help: { icon: string, text: string },
-}
+const provides = inject<BaseField>('provides')!
+const store = useFormStore()
 
-const provides = inject<Field>('provides')!
-
-const name = ref(provides.name)
-
-const tags = ref(provides.value || [])
-
-const formStore = useFormStore()
-formStore.setField(name, tags)
+const form = store.initializer(provides.name, provides.value || [])
+form.max = provides.max || undefined
+form.attributes.disabled = provides.attributes.disabled || false
 
 const customInput = ref('')
 const autoCompleteInstRef = ref<AutoCompleteInst | null>(null)
@@ -60,9 +31,9 @@ const options = computed(() => {
         return []
     }
 
-    return provides.options.filter(item =>
+    return form.options.filter(item =>
         item.startsWith(customInput.value)
-        && !tags.value.includes(item)
+        && !form.value.includes(item)
     )
     .map(item => {
         return {
@@ -72,10 +43,11 @@ const options = computed(() => {
     })
 })
 
+Observer.make(provides.watches)
 </script>
 
 <template>
-    <n-dynamic-tags v-model:value="tags" :max="provides.max" size="large">
+    <n-dynamic-tags v-model:value="form.value" :max="form.max" size="large">
         <template #input="{ submit, deactivate }">
             <n-auto-complete
                 ref="autoCompleteInstRef"
@@ -105,10 +77,10 @@ const options = computed(() => {
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="provides.attributes.required" type="text" :required="!tags.length" :disabled="!!tags.length"
-           :name="`${name}_is_required`" style="display: none;">
+    <input v-if="form.attributes.required" type="text" :required="!form.value.length" :disabled="!!form.value.length"
+           :name="`${form.name}_is_required`" style="display: none;">
 
-    <input v-for="tag in tags" type="hidden" :name="name + '[]'" :value="tag">
+    <input v-for="tag in form.value" type="hidden" :name="form.name + '[]'" :value="tag">
 </template>
 
 <style scoped lang="scss">
