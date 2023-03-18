@@ -17,9 +17,13 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 
 const store = useFormStore()
-const form = store.initializer(provides.name)
-
-form.value = provides.value
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 form.options = provides.options?.map(
     (label: any, value: any) => ({
@@ -30,6 +34,7 @@ form.options = provides.options?.map(
 
 if (provides.optionsFromKeyValueField) {
     store.watchField(
+        provides.formId,
         provides.optionsFromKeyValueField,
         (nv: any) => {
             form.options = nv?.filter(
@@ -45,7 +50,7 @@ if (provides.optionsFromKeyValueField) {
 }
 
 onUnmounted(() => {
-    useFormStore().cleanupWatch(provides.optionsFromKeyValueField)
+    useFormStore().cleanupWatch(provides.formId + provides.optionsFromKeyValueField)
 })
 
 const placement = ref<any>('body')
@@ -54,7 +59,7 @@ onMounted(() => {
     placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

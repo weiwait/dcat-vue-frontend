@@ -15,15 +15,19 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 const store = useFormStore()
 
-const form = store.initializer(provides.name, provides.value || [''])
-form.attributes.required = provides.attributes.required || false
-form.attributes.disabled = provides.attributes.disabled || false
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [''],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 const sortable = ref(provides.sortable ?? false)
 const max = ref(provides.max)
 const min = ref(provides.min)
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

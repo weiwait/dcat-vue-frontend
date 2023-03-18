@@ -22,13 +22,17 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 
 const store = useFormStore()
-const form = store.initializer(provides.name)
+const form = store.initializer(
+    provides.formId,
+    (<any>Object).values(provides.name).join(''),
+    null,
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 form.value = provides.value?.start && provides.value?.end
         ? [Date.parse(provides.value.start), Date.parse(provides.value.end)]
         : null
-
-form.attributes.disabled = provides.attributes.disabled || false
 
 const start = computed(() => form.value ? new Date(form.value[0]).toLocaleDateString() : '')
 const end = computed(() => form.value ? new Date(form.value[1]).toLocaleDateString() : '')
@@ -53,7 +57,7 @@ function disableDates(ts: number): boolean
     })
 }
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, (<any>Object).values(provides.name).join(''))
 </script>
 
 <template>

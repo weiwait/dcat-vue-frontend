@@ -29,10 +29,11 @@ export declare type BaseField = {
     multiple: boolean,
     help: {icon: string, text: string},
     vid: string,
-    watches: [{field: string, handler: string}],
+    watches: Watch[],
+    formId: string,
 }
 
 declare interface Watch {
-    field: string,
+    target: string,
     handler: string,
 }

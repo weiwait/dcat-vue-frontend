@@ -37,9 +37,13 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 const store = useFormStore()
 
-const form = store.initializer(provides.name, provides.value || [])
-form.attributes.disabled = provides.attributes.disabled || false
-form.attributes.required = provides.attributes.required || false
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 const percentage = ref(0)
 const notification = useNotification()
@@ -101,7 +105,7 @@ function clearFile(index: number) {
     form.value.splice(index, 1)
 }
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

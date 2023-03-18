@@ -27,9 +27,13 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 const store = useFormStore()
 
-const form = store.initializer(provides.name, provides.value)
-form.attributes.disabled = provides.attributes.disabled || false
-form.attributes.required = provides.attributes.required || false
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value,
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 if (provides.options instanceof Array) {
     form.options = provides.options.map(
@@ -45,7 +49,7 @@ if (provides.options instanceof Array) {
 }
 
 if (provides.optionsFromKeyValueField) {
-    store.watchField(provides.optionsFromKeyValueField, (nv: any) => {
+    store.watchField(provides.formId, provides.optionsFromKeyValueField, (nv: any) => {
         // 过滤空值，封装数据为naive组件的依赖格式
         form.options = nv?.filter((item: any) => !!item.value).map((item: any) =>
             ({
@@ -61,7 +65,7 @@ if (provides.optionsFromKeyValueField) {
     })
 
     onUnmounted(() => {
-        useFormStore().cleanupWatch(provides.optionsFromKeyValueField)
+        useFormStore().cleanupWatch(provides.formId + provides.optionsFromKeyValueField)
     })
 }
 
@@ -108,7 +112,7 @@ if (provides.load) {
     provides.load.filters.forEach(filter => {
         const ref = provides.loadRefs.find(ref => ref.name === filter)!
 
-        useFormStore().watchField(filter, (nv: any) => {
+        useFormStore().watchField(provides.formId, filter, (nv: any) => {
             filters[ref.condition] = nv
             nextPageUrl = null
 
@@ -136,7 +140,7 @@ onMounted(() => {
     placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

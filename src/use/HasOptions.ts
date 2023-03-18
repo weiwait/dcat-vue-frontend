@@ -6,11 +6,10 @@ export default class HasOptions {
     private filters: any = {}
     private nextPageUrl: string | null = null
     private preFilters = {}
-    private load
-    private options
 
     constructor(
-        load: {
+        private fid: string,
+        private load: {
             url: string,
             model: string,
             id: string,
@@ -21,16 +20,14 @@ export default class HasOptions {
         loadRefs: [{vid: string, name: string, condition: string}],
         scrolledToBottom: Function[],
         loading: Ref,
-        options: Ref
+        private options: Ref
     ) {
-        this.load = load
-        this.options = options
         const store = useFormStore()
 
         load.filters.forEach(filter => {
             const ref = loadRefs.find(ref => ref.name === filter)!
 
-            store.watchField(ref.name, (nv: any) => {
+            store.watchField(fid, ref.name, (nv: any) => {
                 this.filters[ref.condition] = nv
                 this.nextPageUrl = null
 

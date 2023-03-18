@@ -59,7 +59,13 @@ const provides = inject<Field>('provides')!
 const type = provides.options.quality ? 'jpg' : 'png'
 
 const store = useFormStore()
-const form = store.initializer(provides.name, provides.value || [])
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 const percentage = ref(0)
 
@@ -243,7 +249,7 @@ function dragoverHandler(index: number) {
     dragging.value = index
 }
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

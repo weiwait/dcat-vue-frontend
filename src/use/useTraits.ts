@@ -1,15 +1,18 @@
-import type {Ref} from "vue";
 import {useFormStore} from "@/use/FormStore";
-import type {BaseField, Watch} from "@/component";
-import {isRef, onBeforeUnmount, unref} from "vue";
-import type {ReactiveVariable} from "vue/macros";
-import type {Store} from "pinia";
+import type {Watch} from "@/component";
+import {onBeforeUnmount} from "vue";
 
 export class Observer {
     private wids: string[] = []
+    private fid: string = ''
+    private field: string = ''
 
-    public static make(watches: Watch[]): Observer {
+    public static make(watches: Watch[], fid: string, field: string): Observer|void {
+        if (!watches) return void(0)
+
         const instance = new Observer()
+        instance.fid = fid
+        instance.field = field
 
         instance.watch(watches)
 
@@ -27,8 +30,12 @@ export class Observer {
             const wid = 'wid' + Math.random().toString(36).slice(-8)
             this.wids.push(wid)
 
-            store.watchField(item.field, (nv: any) => {
-                Function(`return ${item.handler}`)()(nv, store.getForm(item.field), store)
+            store.watchField(this.fid, item.target, (nv: any) => {
+                Function(`return ${item.handler}`)()(
+                    nv,
+                    store.getForm(this.fid, this.field),
+                    {forms: store.getForm(this.fid), request: store.request}
+                )
             }, wid)
         })
     }

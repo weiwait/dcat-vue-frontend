@@ -20,7 +20,13 @@ interface Field extends BaseField {
 const provides = inject<Field>('provides')!
 const store = useFormStore()
 
-const form = store.initializer(provides.name, provides.value)
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value,
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 function reBuildIndex(uv: any) {
     form.value = uv.map((item: any, i: number) => {
@@ -44,7 +50,7 @@ onMounted(() => {
     provides.is_serial && reBuildIndex(form.value)
 })
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

@@ -15,10 +15,13 @@ const provides = inject<Field>('provides')!
 
 const store = useFormStore()
 
-const form = store.initializer(provides.name)
-
-form.value = provides.value || []
-form.attributes.disabled = provides.attributes.disabled || false
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 form.disabledOptions = ref<Array<string|number>>(provides.disabled || [])
 
@@ -28,7 +31,7 @@ form.options = provides.options.map((v, k) => ({
     disabled: form.disabledOptions.includes(k),
 }))
 
-Observer.make(provides.watches);
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

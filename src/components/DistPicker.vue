@@ -40,7 +40,13 @@ interface Field extends BaseField{
 
 const provides = inject<Field>('provides')!
 const store = useFormStore();
-const form = store.initializer(provides.name)
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    null,
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
 
 const values = {...provides.value}
 
@@ -59,8 +65,6 @@ form[provides.detailField] = detail
 form[provides.latField] = lat
 form[provides.lngField] = lng
 form[provides.zoomField] = zoom
-
-form.attributes.disabled = provides.attributes.disabled || false
 
 const regions: any = {}
 const height = provides.height
@@ -171,7 +175,7 @@ onUnmounted(() => {
     map?.destroy()
 })
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>

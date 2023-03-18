@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
-import {isProxy, isRef, reactive, ref, toRaw, unref, watch} from "vue";
-import type {Ref} from "vue"
+import {reactive, toRaw, watch} from "vue";
 import axios from "axios";
 
 type Form  = {
@@ -21,50 +20,43 @@ export const useFormStore = defineStore('form', () => {
     const watches = reactive<any>({})
     const delays: any = {}
 
-    function getForm(name: string|Ref, defaultValue: any = undefined): Form
+    function getForm(fid: string, field: string = ''): Form|void
     {
-        const sn: string = unref(name)
-
-        if (!forms[sn]) {
-            initializer(sn)
+        if (field) {
+            return forms[fid][field] || void 0
         }
 
-        return forms[sn]
+        return forms[fid] || void 0
     }
 
-    function updateField(name: string|Ref, value: any, state: string = 'value'): boolean
+    function watchField(fid: string, field: string, handler: (v: any) => void, wid: string = '')
     {
-        const sn = unref(name)
+        if (!forms[fid]) {
+            forms[fid] = {}
+        }
 
-        if (!forms[sn]) return false
+        if (!delays[fid]) {
+            delays[fid] = {}
+        }
 
-        forms[sn][state] = value
-
-        return true
-    }
-
-    function watchField(name: string|Ref, handler: (v: any) => void, wid: string = '')
-    {
-        const sn: string = unref(name)
-
-        if (forms[sn]) {
-            watching(sn, handler, wid)
+        if (forms[fid][field]) {
+            watching(fid, field, handler, wid)
         } else {
-            delays[sn] ? delays[sn].push({handler, wid}) : delays[sn] = [{handler, wid}]
+            delays[fid][field] ? delays[fid][field].push({handler, wid}) : delays[fid][field] = [{handler, wid}]
         }
     }
 
-    function watching(sn: string, handler: (v: any) => void, wid: string)
+    function watching(fid: string, field: string, handler: (v: any) => void, wid: string)
     {
-        watches[wid || sn] = watch(() => forms[sn].value, () => {
-            handler(toRaw(forms[sn].value))
+        watches[wid || fid + field] = watch(() => forms[fid][field].value, () => {
+            handler(toRaw(forms[fid][field].value))
         }, {deep: true})
     }
 
-    function cleanupWatch(id: string|Ref<string>)
+    function cleanupWatch(wid: string)
     {
-        const wid: string = unref(id)
         watches[wid] && watches[wid]()
+        watches[wid] = undefined
     }
 
     function request(config: {})
@@ -72,31 +64,38 @@ export const useFormStore = defineStore('form', () => {
         return axios.request(config)
     }
 
-    function initializer(field: string|Ref<string>, value: any = null): Form
-    {
-        const sn: string = unref(field)
+    function initializer(
+        fid: string,
+        field: string,
+        value: any = null,
+        required: boolean = false,
+        disabled: boolean = false,
+    ): Form {
+        if (!forms[fid]) {
+            forms[fid] = {}
+        }
 
-        forms[sn] = reactive<Form>({
-            name: sn,
+        forms[fid][field] = reactive<Form>({
+            name: field,
             value: value,
             disabled: false,
             options: [],
             attributes: {
-                required: false,
-                disabled: false,
+                required: required,
+                disabled: disabled,
             }
         })
 
-        if (undefined !== delays[sn]) {
-            delays[sn].forEach((delay: {handler: (v: any) => void, wid: string}) => {
-                watching(sn, delay.handler, delay.wid)
+        if (delays[fid] && delays[fid][field]) {
+            delays[fid][field].forEach((delay: {handler: (v: any) => void, wid: string}) => {
+                watching(fid, field, delay.handler, delay.wid)
             })
 
-            delays[sn] = undefined
+            delays[fid][field] = undefined
         }
 
-        return forms[sn]
+        return forms[fid][field]
     }
 
-    return {getForm, watchField, cleanupWatch, updateField, request, initializer}
+    return {getForm, watchField, cleanupWatch, request, initializer, forms, watches}
 })

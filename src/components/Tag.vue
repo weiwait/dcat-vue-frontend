@@ -15,9 +15,15 @@ import type {BaseField} from "@/component";
 const provides = inject<BaseField>('provides')!
 const store = useFormStore()
 
-const form = store.initializer(provides.name, provides.value || [])
+const form = store.initializer(
+    provides.formId,
+    provides.name,
+    provides.value || [],
+    provides.attributes.required || false,
+    provides.attributes.disabled || false
+)
+
 form.max = provides.max || undefined
-form.attributes.disabled = provides.attributes.disabled || false
 
 const customInput = ref('')
 const autoCompleteInstRef = ref<AutoCompleteInst | null>(null)
@@ -43,7 +49,7 @@ const options = computed(() => {
     })
 })
 
-Observer.make(provides.watches)
+Observer.make(provides.watches, provides.formId, provides.name)
 </script>
 
 <template>
