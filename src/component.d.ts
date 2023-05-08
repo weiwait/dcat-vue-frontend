@@ -1,7 +1,7 @@
 export declare type BaseField = {
     [key: string]: any,
     name: string,
-    column: string|object,
+    column: string|{[key: string]: any},
     value: any,
     attributes: {
         [key: string]: any,

@@ -69,8 +69,6 @@ if (provides.optionsFromKeyValueField) {
     })
 }
 
-const placement = ref<any>('body')
-
 const scrolledToBottom: Function[] = []
 const loading = ref(false)
 function handleScroll(e: Event) {
@@ -136,6 +134,7 @@ if (provides.load) {
     }
 }
 
+const placement = ref<any>('body')
 onMounted(() => {
     placement.value = document.getElementById(provides.vid)!.closest('.layui-layer.layui-layer-page') || 'body'
 })

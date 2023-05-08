@@ -9,6 +9,7 @@ import DistPicker from './components/DistPicker.vue'
 import Select from './components/Select.vue'
 import MultipleSelect from './components/MultipleSelect.vue'
 import NumberComponent from './components/Number.vue'
+import Icon from './components/Icon.vue'
 import type {App} from "vue";
 // import {defineAsyncComponent} from "vue";
 
@@ -25,6 +26,7 @@ export default function registerFields(app: App) {
         .component('Select', Select)
         .component('MultipleSelect', MultipleSelect)
         .component('Number', NumberComponent)
+        .component('Icon', Icon)
 
     // app.component('File', defineAsyncComponent(() => import('@/components/File.vue')))
     //     .component('CheckBox', defineAsyncComponent(() => import('@/components/CheckBox.vue')))
