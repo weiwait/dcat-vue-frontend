@@ -134,8 +134,8 @@ export class WeMap extends Map {
         // @ts-ignore
         this.ll2address(this.getLat(lat), this.getLng(lng)).then(({ad_info, pois}) => {
             this.addressUpdatedHandler(ad_info.adcode)
-            if (lat) this.lat.value = lat
-            if (lng) this.lng.value = lng
+            if (lat) this.lat.value = lat.toFixed(4)
+            if (lng) this.lng.value = lng.toFixed(4)
 
             const first = pois[0]
             if (first) {

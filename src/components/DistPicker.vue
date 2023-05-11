@@ -39,7 +39,7 @@ interface Field extends BaseField{
 }
 
 const provides = inject<Field>('provides')!
-const store = useFormStore();
+const store = useFormStore()
 const form = store.initializer(
     provides.formId,
     provides.name,
@@ -192,7 +192,7 @@ Observer.make(provides.watches, provides.formId, provides.name)
             :disabled="form.attributes.disabled"
         />
         <n-select
-            v-if="provides.provinceField || provides.cityField || provides.districtField"
+            v-if="provides.cityField || provides.districtField"
             v-model:value="city"
             filterable
             clearable
@@ -203,7 +203,7 @@ Observer.make(provides.watches, provides.formId, provides.name)
             :disabled="form.attributes.disabled"
         />
         <n-select
-            v-if="provides.provinceField || provides.cityField || provides.districtField"
+            v-if="provides.districtField"
             v-model:value="district"
             filterable
             clearable
@@ -243,6 +243,48 @@ Observer.make(provides.watches, provides.formId, provides.name)
     <span class="help-block" v-if="!empty(provides.help)">
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
+
+    <input v-if="provides.provinceField && form.attributes.required"
+           type="text"
+           :required="empty(province)"
+           :disabled="!empty(province)"
+           :name="`${provides.provinceField}_is_required`"
+           style="display: none;">
+
+    <input v-if="provides.cityField && form.attributes.required"
+           type="text"
+           :required="empty(city)"
+           :disabled="!empty(city)"
+           :name="`${provides.cityField}_is_required`"
+           style="display: none;">
+
+    <input v-if="provides.districtField && form.attributes.required"
+           type="text"
+           :required="empty(districts)"
+           :disabled="!empty(districts)"
+           :name="`${provides.districtField}_is_required`"
+           style="display: none;">
+
+    <input v-if="provides.detailField && form.attributes.required"
+           type="text"
+           :required="empty(detail)"
+           :disabled="!empty(detail)"
+           :name="`${provides.detailField}_is_required`"
+           style="display: none;">
+
+    <input v-if="provides.latField && form.attributes.required"
+           type="text"
+           :required="empty(lat)"
+           :disabled="!empty(lat)"
+           :name="`${provides.latField}_is_required`"
+           style="display: none;">
+
+    <input v-if="provides.lngField && form.attributes.required"
+           type="text"
+           :required="empty(lng)"
+           :disabled="!empty(lng)"
+           :name="`${provides.lngField}_is_required`"
+           style="display: none;">
 
     <input v-if="provides.provinceField" type="hidden" :name="provides.provinceField" :value="province">
     <input v-if="provides.cityField" type="hidden" :name="provides.cityField" :value="city">

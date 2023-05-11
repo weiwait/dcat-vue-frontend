@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, inject} from "vue";
+import {ref, inject, computed} from "vue";
 import {NInputNumber} from "naive-ui";
 import type {BaseField} from "@/component";
 import {empty} from "@/use/Utils";
@@ -29,10 +29,26 @@ const store = useFormStore()
 const form = store.initializer(
     provides.formId,
     provides.name,
-    provides.value,
+    provides.value ?? null,
     provides.attributes.required || false,
     provides.attributes.disabled || false
 )
+
+const required = computed((): boolean => {
+    const isEmpty = empty(form.value)
+    let isLess = false
+    let isGreat = false
+
+    if (!isEmpty && 'number' === typeof provides.min) {
+        isLess = form.value < provides.min
+    }
+
+    if (!isEmpty && 'number' === typeof provides.max) {
+        isGreat = form.value >= provides.max
+    }
+
+    return (isEmpty && provides.attributes.required) || isLess || isGreat
+})
 
 Observer.make(provides.watches, provides.formId, provides.name)
 </script>
@@ -40,10 +56,10 @@ Observer.make(provides.watches, provides.formId, provides.name)
 <template>
     <n-input-number
         v-model:value="form.value"
-        :clearable="provides.clearable"
+        :clearable="!!provides.clearable || !form.attributes.required"
         :placeholder="provides.placeholder"
-        :precision="provides.precision"
-        :step="provides.step"
+        :precision="provides.precision || 0"
+        :step="provides.step || 1"
         :min="provides.min"
         :max="provides.max"
         :readonly="!!provides.disabled"
@@ -64,10 +80,10 @@ Observer.make(provides.watches, provides.formId, provides.name)
         <i :class="['fa', provides.help.icon]"></i>&nbsp;{{provides.help.text}}
     </span>
 
-    <input v-if="form.attributes.required"
+    <input v-if="form.attributes.required || !empty(provides.min) || !empty(provides.max)"
            type="text"
-           :required="empty(form.value)"
-           :disabled="!empty(form.value)"
+           :required="true"
+           :disabled="!required"
            :name="`${form.name}_is_required`"
            style="display: none;">
 
