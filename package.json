@@ -2,7 +2,7 @@
   "name": "dcat-cropper",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite build --mode development",
+    "dev": "vite build --watch",
     "build": "vue-tsc --noEmit & vite build",
     "preview": "vite preview --port 5050",
     "typecheck": "vue-tsc --noEmit"
@@ -11,7 +11,6 @@
     "@ckeditor/ckeditor5-build-classic": "^35.4.0",
     "@ckeditor/ckeditor5-vue": "^4.0.1",
     "@tinymce/tinymce-vue": "^4.0.7",
-    "@types/ckeditor__ckeditor5-core": "^33.0.3",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
     "cropperjs": "^1.5.13",

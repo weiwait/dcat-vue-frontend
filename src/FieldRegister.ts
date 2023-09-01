@@ -11,6 +11,7 @@ import MultipleSelect from './components/MultipleSelect.vue'
 import NumberComponent from './components/Number.vue'
 import Icon from './components/Icon.vue'
 import type {App} from "vue";
+import Commodity from "@/components/Commodity.vue";
 // import {defineAsyncComponent} from "vue";
 
 
@@ -27,6 +28,7 @@ export default function registerFields(app: App) {
         .component('MultipleSelect', MultipleSelect)
         .component('Number', NumberComponent)
         .component('Icon', Icon)
+        .component('Sku', Commodity)
 
     // app.component('File', defineAsyncComponent(() => import('@/components/File.vue')))
     //     .component('CheckBox', defineAsyncComponent(() => import('@/components/CheckBox.vue')))

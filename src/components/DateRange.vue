@@ -24,7 +24,7 @@ const provides = inject<Field>('provides')!
 const store = useFormStore()
 const form = store.initializer(
     provides.formId,
-    (<any>Object).values(provides.name).join(''),
+    (<any>Object).values(provides.name).join('&'),
     null,
     provides.attributes.required || false,
     provides.attributes.disabled || false

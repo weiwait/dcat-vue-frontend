@@ -29,7 +29,7 @@ const store = useFormStore()
 
 const form = store.initializer(
     provides.formId,
-    provides.name,
+    Object.values(provides.name).join('&'),
     null,
     provides.attributes.required || false,
     provides.attributes.disabled || false

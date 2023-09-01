@@ -37,7 +37,7 @@ Observer.make(provides.watches, provides.formId, provides.name)
 <template>
     <n-checkbox-group v-model:value="form.value" :disabled="form.attributes.disabled">
         <n-space item-style="display: flex;">
-            <template v-for="option of form.options" :key="k">
+            <template v-for="option in form.options">
                 <n-checkbox :value="option.value"
                             :label="option.label"
                             size="medium"

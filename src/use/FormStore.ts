@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {reactive, toRaw, watch} from "vue";
+import {reactive, toValue, watch, watchEffect, watchPostEffect} from "vue";
 import axios from "axios";
 
 type Form  = {
@@ -48,15 +48,15 @@ export const useFormStore = defineStore('form', () => {
 
     function watching(fid: string, field: string, handler: (v: any) => void, wid: string)
     {
-        watches[wid || fid + field] = watch(() => forms[fid][field].value, () => {
-            handler(toRaw(forms[fid][field].value))
-        }, {deep: true})
+        watches[wid || fid + field] = watchPostEffect( () => {
+            handler(toValue(forms[fid][field].value))
+        })
     }
 
     function cleanupWatch(wid: string)
     {
         watches[wid] && watches[wid]()
-        watches[wid] = undefined
+        delete watches[wid]
     }
 
     function request(config: {})
@@ -71,6 +71,8 @@ export const useFormStore = defineStore('form', () => {
         required: boolean = false,
         disabled: boolean = false,
     ): Form {
+        _cleanupForms()
+
         if (!forms[fid]) {
             forms[fid] = {}
         }
@@ -97,5 +99,14 @@ export const useFormStore = defineStore('form', () => {
         return forms[fid][field]
     }
 
-    return {getForm, watchField, cleanupWatch, request, initializer, forms, watches}
+    function _cleanupForms()
+    {
+        Object.keys(forms).forEach((fid: string) => {
+            if (!document.querySelector(`#${fid}`)) {
+                delete forms[fid]
+            }
+        })
+    }
+
+    return {getForm, watchField, cleanupWatch, request, initializer, forms, watches, delays}
 })

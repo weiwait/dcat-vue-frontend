@@ -53,7 +53,7 @@ if (provides.optionsFromKeyValueField) {
         // 过滤空值，封装数据为naive组件的依赖格式
         form.options = nv?.filter((item: any) => !!item.value).map((item: any) =>
             ({
-                label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` :item.value,
+                label: provides.concatSeparator ? `${item.key}${provides.concatSeparator}${item.value}` : item.value,
                 value: item.key
             })
         )
@@ -115,6 +115,10 @@ if (provides.load) {
             nextPageUrl = null
 
             loadOptions()
+        })
+
+        onUnmounted(() => {
+            useFormStore().cleanupWatch(provides.formId + filter)
         })
     })
 
